@@ -50,8 +50,42 @@ public class Main extends JPanel implements MouseMotionListener
         frame.setSize(800, 600);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
+    } 
+}
+
+public class Food (String name, int completed, double price, int rarity, ArrayList<Ingredients> listofingredients )
+  {
+    public String getname()
+    {
+      return(name):
     }
-  //hello
+  public int getcompleted()
+    {
+      return(completed):
+    }
+  public double getprice()
+    {
+      return(price):
+    }
+  public int getname()
+    {
+      return(rarity):
+    }
+  public boolean completioncheck
+  {
+    for(int i = 0; i < listofingredient.length; i++)
+    {
+      if(listofingredients.get(i).equals(something))
+        {
+          x += 1
+        }
+    }
+  
+  }
+public class Ingredients(String name1)
+{
+  
+  
 }
 
 
