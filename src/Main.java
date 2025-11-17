@@ -1,6 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
 
 
 public class Main extends JPanel implements MouseMotionListener
@@ -55,6 +56,8 @@ public class Main extends JPanel implements MouseMotionListener
 
 public class Food (String name, int completed, double price, int rarity, ArrayList<Ingredients> listofingredients )
   {
+    Imagesfood apple = new Imagesfood("apple");
+    apple.getImage();
     public String getname()
     {
       return(name):
@@ -84,8 +87,29 @@ public class Food (String name, int completed, double price, int rarity, ArrayLi
   }
 public class Ingredients(String name1)
 {
+  // Source - https://stackoverflow.com/a
+// Posted by Emz, modified by community. See post 'Timeline' for change history
+// Retrieved 2025-11-17, License - CC BY-SA 3.0
+
+
+}
+
   
-  
+public class Imagesfood (String imagename){
+    private String imagename;
+    private BufferedImage image;
+    public Imagesfood (String imagename) {
+        this.imagename = imagename;
+        this.image = ImageIO.read(new File(name + ".png"));
+    }
+
+    public String getName () {
+        return name;
+    }
+
+    public BufferedImage getImage () {
+        return image;
+    }
 }
 
 
