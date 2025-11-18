@@ -13,8 +13,8 @@ public class Main extends JPanel implements MouseMotionListener
     }
 
         // Image loaded via Imagesfood
-        private BufferedImage appleImage = null;
-        private Imagesfood apple;
+        private BufferedImage storeImage = null;
+        private Imagesfood store;
         
 
 
@@ -31,13 +31,13 @@ public class Main extends JPanel implements MouseMotionListener
         // Black circle at mouse position
         g.setColor(Color.BLACK);
         g.fillOval(mouseX - 15, mouseY - 15, 30, 30);
-        // g.drawImage(appleImage, x, y, this);
+        // g.drawImage(storeImage, x, y, this);
         // Draw the image in the top-left (or center if you prefer)
-        if (appleImage != null) {
+        if (storeImage != null) {
             // Example: draw on the left side, with a 10px margin
             int imgX = 10;
             int imgY = 10;
-            g.drawImage(appleImage, imgX, imgY, this);
+            g.drawImage(storeImage, imgX, imgY, this);
         }
 
     }
@@ -64,8 +64,8 @@ public class Main extends JPanel implements MouseMotionListener
             Main panel = new Main();
             frame.add(panel);
             // Load image from assets (synchronously) and repaint.
-            panel.apple = new Imagesfood("apple");
-            panel.appleImage = panel.apple.getImage();
+            panel.store = new Imagesfood("store");
+            panel.storeImage = panel.store.getImage();
             frame.setSize(800, 600);
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setVisible(true);
