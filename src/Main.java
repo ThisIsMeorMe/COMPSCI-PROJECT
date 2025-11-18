@@ -24,7 +24,7 @@ public class Main extends JPanel implements MouseMotionListener
 
 
         // Red background
-        g.setColor(Color.RED);
+        g.setColor(Color.BLACK);
         g.fillRect(0, 0, getWidth(), getHeight());
 
 
