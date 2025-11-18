@@ -13,7 +13,12 @@ public class Main extends JPanel implements MouseMotionListener
     }
 
         // Image loaded via Imagesfood
-        private BufferedImage storeImage = null;
+        // keep original so we can rescale dynamically to the window size
+        private BufferedImage storeImageOriginal = null;
+        // cached scaled image for current panel size
+        private BufferedImage storeImageScaled = null;
+        private int lastScaledW = -1;
+        private int lastScaledH = -1;
         private Imagesfood store;
         
 
@@ -32,12 +37,29 @@ public class Main extends JPanel implements MouseMotionListener
         g.setColor(Color.BLACK);
         g.fillOval(mouseX - 15, mouseY - 15, 30, 30);
         // g.drawImage(storeImage, x, y, this);
-        // Draw the image in the top-left (or center if you prefer)
-        if (storeImage != null) {
-            // Example: draw on the left side, with a 10px margin
-            int imgX = 10;
-            int imgY = 10;
-            g.drawImage(storeImage, imgX, imgY, this);
+        // Draw the image scaled to fit the panel while preserving aspect ratio
+        if (storeImageOriginal != null) {
+            int margin = 10;
+            int availW = Math.max(1, getWidth() - margin * 2);
+            int availH = Math.max(1, getHeight() - margin * 2);
+            int imgW = storeImageOriginal.getWidth();
+            int imgH = storeImageOriginal.getHeight();
+            double ratio = Math.min((double) availW / imgW, (double) availH / imgH);
+            int targetW = Math.max(1, (int) Math.round(imgW * ratio));
+            int targetH = Math.max(1, (int) Math.round(imgH * ratio));
+
+            // Only rescale when panel size (targetW/targetH) changes
+            if (targetW != lastScaledW || targetH != lastScaledH || storeImageScaled == null) {
+                storeImageScaled = getScaledImage(storeImageOriginal, targetW, targetH);
+                lastScaledW = targetW;
+                lastScaledH = targetH;
+            }
+
+            int imgX = (getWidth() - targetW) / 2;
+            int imgY = (getHeight() - targetH) / 2;
+            if (storeImageScaled != null) {
+                g.drawImage(storeImageScaled, imgX, imgY, null);
+            }
         }
 
     }
@@ -57,6 +79,21 @@ public class Main extends JPanel implements MouseMotionListener
         mouseMoved(e);
     }
 
+    /**
+     * High-quality image scaler. Returns a new BufferedImage sized to targetW/targetH.
+     */
+    private BufferedImage getScaledImage(BufferedImage src, int targetW, int targetH) {
+        if (src == null) return null;
+        BufferedImage resized = new BufferedImage(targetW, targetH, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = resized.createGraphics();
+        g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+        g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.drawImage(src, 0, 0, targetW, targetH, null);
+        g2.dispose();
+        return resized;
+    }
+
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
@@ -65,7 +102,9 @@ public class Main extends JPanel implements MouseMotionListener
             frame.add(panel);
             // Load image from assets (synchronously) and repaint.
             panel.store = new Imagesfood("store");
-            panel.storeImage = panel.store.getImage();
+            // keep original; painting will scale to fit the window
+            panel.storeImageOriginal = panel.store.getImage();
+            panel.storeImageScaled = null; // ensure cached scaled image will be created on first paint
             frame.setSize(800, 600);
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setVisible(true);
@@ -76,62 +115,6 @@ public class Main extends JPanel implements MouseMotionListener
     } 
 }
 
-// public class Food (String name, int completed, double price, int rarity, ArrayList<Ingredients> listofingredients )
-//   {
-//    
-//     public String getname()
-//     {
-//       return(name):
-//     }
-//   public int getcompleted()
-//     {
-//       return(completed):
-//     }
-//   public double getprice()
-//     {
-//       return(price):
-//     }
-//   public int getname()
-//     {
-//       return(rarity):
-//     }
-//   public boolean completioncheck
-//   {
-//     for(int i = 0; i < listofingredient.length; i++)
-//     {
-//       if(listofingredients.get(i).equals(something))
-//         {
-//           x += 1
-//         }
-//     }
-  
-//   }
-// public class Ingredients(String name1)
-// {
-//   // Source - https://stackoverflow.com/a
-// // Posted by Emz, modified by community. See post 'Timeline' for change history
-// // Retrieved 2025-11-17, License - CC BY-SA 3.0
-
-
-// }
-
-  
-// public class Imagesfood (String imagename, BufferedImage image) {
-//      private String imagename;
-//      private BufferedImage image;
-//      public Imagesfood (String imagename) {
-//          this.imagename = imagename;
-//          this.image = ImageIO.read(new File(name + ".png"));
-//      }
-
-//      public String getName () {
-//          return name;
-//      }
-
-//      public BufferedImage getImage () {
-//          return image;
-//      }
-// }
 
  
 
