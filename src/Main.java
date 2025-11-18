@@ -109,6 +109,14 @@ public class Main extends JPanel implements MouseMotionListener
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setVisible(true);
             panel.repaint();
+          // JLabel label = new JLabel("This is a label with static text.");
+          //   frame.add(label);
+
+          //   // Using a JTextField to display editable or dynamic text
+          //   JTextField textField = new JTextField("Initial text in a text field", 20);
+          //   frame.add(textField);
+
+          //   frame.setVisible(true);
         });
         // Repaint happens after image load in the EDT
 
