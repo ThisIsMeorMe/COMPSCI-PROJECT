@@ -232,6 +232,7 @@ public class Main extends JPanel implements MouseMotionListener
                 g.drawImage(storeImageScaled, imgX, imgY, null);
             }
         }
+        
         if (appleImage != null) {
 //             // Example: draw on the left side, with a 10px margin
             int imgX = 10;
@@ -354,8 +355,8 @@ public class Main extends JPanel implements MouseMotionListener
         }
         if (man_idle != null) {
 //             // Example: draw on the left side, with a 10px margin
-            int imgX = 1420;
-            int imgY = 675;
+            int imgX = 1410;
+            int imgY = 644;
             g.drawImage(man_idleImage, imgX, imgY, this);
         }
 
