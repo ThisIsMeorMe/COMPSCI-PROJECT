@@ -51,6 +51,9 @@ public class Main extends JPanel implements MouseMotionListener
         private Imagesfood tbone;
         private BufferedImage watermelonImage = null;
         private Imagesfood watermelon;
+        private BufferedImage man_idleImage = null;
+        private Imagesfood man_idle;
+        
 
         // Image loaded via Imagesfood
         // keep original so we can rescale dynamically to the window size
@@ -76,6 +79,159 @@ public class Main extends JPanel implements MouseMotionListener
         // Black circle at mouse position
         g.setColor(Color.BLACK);
         g.fillOval(mouseX - 15, mouseY - 15, 30, 30);
+//         if (appleImage != null) {
+// //             // Example: draw on the left side, with a 10px margin
+//             int imgX = 10;
+//             int imgY = 10;
+//             g.drawImage(appleImage, imgX, imgY, this);
+//         }
+//         if (apple_pieImage != null) {
+//             // Example: draw on the left side, with a 10px margin
+//             int imgX = 50;
+//             int imgY = 10;
+//             g.drawImage(apple_pieImage, imgX, imgY, this);
+//         }
+//         if (avocadoImage != null) {
+// //             // Example: draw on the left side, with a 10px margin
+//             int imgX = 100;
+//             int imgY = 10;
+//             g.drawImage(avocadoImage, imgX, imgY, this);
+//         }
+//         if (boar_headImage != null) {
+//             // Example: draw on the left side, with a 10px margin
+//             int imgX = 150;
+//             int imgY = 10;
+//             g.drawImage(boar_headImage, imgX, imgY, this);
+//         }
+//         if (breadImage != null) {
+//             // Example: draw on the left side, with a 10px margin
+//             int imgX = 200;
+//             int imgY = 10;
+//             g.drawImage(breadImage, imgX, imgY, this);
+//         }
+//         if (cheeseImage != null) {
+//             // Example: draw on the left side, with a 10px margin
+//             int imgX = 250;
+//             int imgY = 10;
+//             g.drawImage(cheeseImage, imgX, imgY, this);
+//         }
+//         if (cheesecakeImage != null) {
+//             // Example: draw on the left side, with a 10px margin
+//             int imgX = 300;
+//             int imgY = 10;
+//             g.drawImage(cheesecakeImage, imgX, imgY, this);
+//         }
+//         if (chickenImage != null) {
+//             // Example: draw on the left side, with a 10px margin
+//             int imgX = 350;
+//             int imgY = 10;
+//             g.drawImage(chickenImage, imgX, imgY, this);
+//         }
+//         if (cookieImage != null) {
+// //             // Example: draw on the left side, with a 10px margin
+//             int imgX = 400;
+//             int imgY = 10;
+//             g.drawImage(cookieImage, imgX, imgY, this);
+//         }
+//         if (dragon_fruitImage != null) {
+// //             // Example: draw on the left side, with a 10px margin
+//             int imgX = 450;
+//             int imgY = 10;
+//             g.drawImage(dragon_fruitImage, imgX, imgY, this);
+//         }
+//         if (fishImage != null) {
+// //             // Example: draw on the left side, with a 10px margin
+//             int imgX = 500;
+//             int imgY = 10;
+//             g.drawImage(fishImage, imgX, imgY, this);
+//         }
+//         if (fried_eggsImage != null) {
+// //             // Example: draw on the left side, with a 10px margin
+//             int imgX = 550;
+//             int imgY = 10;
+//             g.drawImage(fried_eggsImage, imgX, imgY, this);
+//         }
+//         if (honeyImage != null) {
+// //             // Example: draw on the left side, with a 10px margin
+//             int imgX = 600;
+//             int imgY = 10;
+//             g.drawImage(honeyImage, imgX, imgY, this);
+//         }
+//         if (pineappleImage != null) {
+// //             // Example: draw on the left side, with a 10px margin
+//             int imgX = 650;
+//             int imgY = 10;
+//             g.drawImage(pineappleImage, imgX, imgY, this);
+//         }
+//         if (pretzelImage != null) {
+// //             // Example: draw on the left side, with a 10px margin
+//             int imgX = 700;
+//             int imgY = 10;
+//             g.drawImage(pretzelImage, imgX, imgY, this);
+//         }
+//         if (pumpkin_pieImage != null) {
+// //             // Example: draw on the left side, with a 10px margin
+//             int imgX = 10;
+//             int imgY = 50;
+//             g.drawImage(pumpkin_pieImage, imgX, imgY, this);
+//         }
+//         if (shrimpImage != null) {
+// //             // Example: draw on the left side, with a 10px margin
+//             int imgX = 50;
+//             int imgY = 50;
+//             g.drawImage(shrimpImage, imgX, imgY, this);
+//         }
+//         if (sushiImage != null) {
+// //             // Example: draw on the left side, with a 10px margin
+//             int imgX = 100;
+//             int imgY = 50;
+//             g.drawImage(sushiImage, imgX, imgY, this);
+//         }
+//         if (tboneImage != null) {
+// //             // Example: draw on the left side, with a 10px margin
+//             int imgX = 150;
+//             int imgY = 50;
+//             g.drawImage(tboneImage, imgX, imgY, this);
+//         }
+//         if (watermelonImage != null) {
+// //             // Example: draw on the left side, with a 10px margin
+//             int imgX = 200;
+//             int imgY = 50;
+//             g.drawImage(watermelonImage, imgX, imgY, this);
+//         }
+//         if (man_idle != null) {
+// //             // Example: draw on the left side, with a 10px margin
+//             int imgX = 1500;
+//             int imgY = 500;
+//             g.drawImage(man_idleImage, imgX, imgY, this);
+//         }
+        
+
+        // g.drawImage(storeImage, x, y, this);
+        // Draw the image scaled to fit the panel while preserving aspect ratio
+        if (storeImageOriginal != null) {
+            int margin = 10;
+            int availW = Math.max(1, getWidth() - margin * 2);
+            int availH = Math.max(1, getHeight() - margin * 2);
+            int imgW = storeImageOriginal.getWidth();
+            int imgH = storeImageOriginal.getHeight();
+            double ratio = Math.min((double) availW / imgW, (double) availH / imgH);
+            int targetW = Math.max(1, (int) Math.round(imgW * ratio));
+            int targetH = Math.max(1, (int) Math.round(imgH * ratio));
+
+            // Only rescale when panel size (targetW/targetH) changes
+            if (targetW != lastScaledW || targetH != lastScaledH || storeImageScaled == null) {
+                storeImageScaled = getScaledImage(storeImageOriginal, targetW, targetH);
+                lastScaledW = targetW;
+                lastScaledH = targetH;
+            }
+
+            int imgX = (getWidth() - targetW) / 2;
+            int imgY = (getHeight() - targetH) / 2;
+            if (storeImageScaled != null) {
+                g.drawImage(storeImageScaled, imgX, imgY, null);
+            }
+        }
         if (appleImage != null) {
 //             // Example: draw on the left side, with a 10px margin
             int imgX = 10;
@@ -196,31 +352,11 @@ public class Main extends JPanel implements MouseMotionListener
             int imgY = 50;
             g.drawImage(watermelonImage, imgX, imgY, this);
         }
-
-        // g.drawImage(storeImage, x, y, this);
-        // Draw the image scaled to fit the panel while preserving aspect ratio
-        if (storeImageOriginal != null) {
-            int margin = 10;
-            int availW = Math.max(1, getWidth() - margin * 2);
-            int availH = Math.max(1, getHeight() - margin * 2);
-            int imgW = storeImageOriginal.getWidth();
-            int imgH = storeImageOriginal.getHeight();
-            double ratio = Math.min((double) availW / imgW, (double) availH / imgH);
-            int targetW = Math.max(1, (int) Math.round(imgW * ratio));
-            int targetH = Math.max(1, (int) Math.round(imgH * ratio));
-
-            // Only rescale when panel size (targetW/targetH) changes
-            if (targetW != lastScaledW || targetH != lastScaledH || storeImageScaled == null) {
-                storeImageScaled = getScaledImage(storeImageOriginal, targetW, targetH);
-                lastScaledW = targetW;
-                lastScaledH = targetH;
-            }
-
-            int imgX = (getWidth() - targetW) / 2;
-            int imgY = (getHeight() - targetH) / 2;
-            if (storeImageScaled != null) {
-                g.drawImage(storeImageScaled, imgX, imgY, null);
-            }
+        if (man_idle != null) {
+//             // Example: draw on the left side, with a 10px margin
+            int imgX = 1420;
+            int imgY = 675;
+            g.drawImage(man_idleImage, imgX, imgY, this);
         }
 
     }
@@ -261,7 +397,59 @@ public class Main extends JPanel implements MouseMotionListener
             JFrame frame = new JFrame("Red Window with Cursor Circle");
             Main panel = new Main();
             frame.add(panel);
-            panel.apple = new Imagesfood("apple");
+            // panel.apple = new Imagesfood("apple");
+            // panel.appleImage = panel.apple.getImage();
+            // panel.apple_pie = new Imagesfood("apple_pie");
+            // panel.apple_pieImage = panel.apple_pie.getImage();
+            // panel.avocado = new Imagesfood("avocado");
+            // panel.avocadoImage = panel.avocado.getImage();
+            // panel.boar_head = new Imagesfood("boar_head");
+            // panel.boar_headImage = panel.boar_head.getImage();
+            // panel.bread = new Imagesfood("bread");
+            // panel.breadImage = panel.bread.getImage();
+            // panel.cheese = new Imagesfood("cheese");
+            // panel.cheeseImage = panel.cheese.getImage();
+            // panel.cheesecake = new Imagesfood("cheesecake");
+            // panel.cheesecakeImage = panel.cheesecake.getImage();
+            // panel.chicken = new Imagesfood("chicken");
+            // panel.chickenImage = panel.chicken.getImage();
+            // panel.cookie = new Imagesfood("cookie");
+            // panel.cookieImage = panel.cookie.getImage();
+            // panel.dragon_fruit = new Imagesfood("dragon_fruit");
+            // panel.dragon_fruitImage = panel.dragon_fruit.getImage();
+            // panel.fish = new Imagesfood("fish");
+            // panel.fishImage = panel.fish.getImage();
+            // panel.fried_eggs = new Imagesfood("fried_eggs");
+            // panel.fried_eggsImage = panel.fried_eggs.getImage();
+            // panel.honey = new Imagesfood("honey");
+            // panel.honeyImage = panel.honey.getImage();
+            // panel.pineapple = new Imagesfood("pineapple");
+            // panel.pineappleImage = panel.pineapple.getImage();
+            // panel.pretzel = new Imagesfood("pretzel");
+            // panel.pretzelImage = panel.pretzel.getImage();
+            // panel.pumpkin_pie = new Imagesfood("pumpkin_pie");
+            // panel.pumpkin_pieImage = panel.pumpkin_pie.getImage();
+            // panel.shrimp = new Imagesfood("shrimp");
+            // panel.shrimpImage = panel.shrimp.getImage();
+            // panel.sushi = new Imagesfood("sushi");
+            // panel.sushiImage = panel.sushi.getImage();
+            // panel.tbone = new Imagesfood("t-bone");
+            // panel.tboneImage = panel.tbone.getImage();
+            // panel.watermelon = new Imagesfood("watermelon");
+            // panel.watermelonImage = panel.watermelon.getImage();
+            // // Load image from assets (synchronously) and repaint.
+            
+            // panel.man_idle = new Imagesfood("man_idle");
+            // panel.man_idleImage = panel.man_idle.getImage();
+            // keep original; painting will scale to fit the window
+            panel.store = new Imagesfood("store");
+            panel.storeImageOriginal = panel.store.getImage();
+            panel.storeImageScaled = null; // ensure cached scaled image will be created on first paint
+            frame.setSize(800, 600);
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.setVisible(true);
+            panel.repaint();
+             panel.apple = new Imagesfood("apple");
             panel.appleImage = panel.apple.getImage();
             panel.apple_pie = new Imagesfood("apple_pie");
             panel.apple_pieImage = panel.apple_pie.getImage();
@@ -302,14 +490,9 @@ public class Main extends JPanel implements MouseMotionListener
             panel.watermelon = new Imagesfood("watermelon");
             panel.watermelonImage = panel.watermelon.getImage();
             // Load image from assets (synchronously) and repaint.
-            panel.store = new Imagesfood("store");
-            // keep original; painting will scale to fit the window
-            panel.storeImageOriginal = panel.store.getImage();
-            panel.storeImageScaled = null; // ensure cached scaled image will be created on first paint
-            frame.setSize(800, 600);
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.setVisible(true);
-            panel.repaint();
+            
+            panel.man_idle = new Imagesfood("man_idle");
+            panel.man_idleImage = panel.man_idle.getImage();
           // JLabel label = new JLabel("This is a label with static text.");
           //   frame.add(label);
 
