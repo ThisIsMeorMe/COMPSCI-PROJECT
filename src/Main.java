@@ -4,6 +4,8 @@ import java.awt.image.BufferedImage;
 import javax.swing.*;
 
 
+
+
 public class Main extends JPanel implements MouseMotionListener
 {
   private int mouseX = -10;
@@ -11,6 +13,12 @@ public class Main extends JPanel implements MouseMotionListener
   public Main() {
         addMouseMotionListener(this);
     }
+    public class testmouse {
+     public static void main(String[] args){
+         int mouseY = MouseInfo.getPointerInfo().getLocation().y;
+          int mouseX = MouseInfo.getPointerInfo().getLocation().x;
+         } 
+        }
         private BufferedImage appleImage = null;
         private Imagesfood apple;
         private BufferedImage apple_pieImage = null;
@@ -72,7 +80,7 @@ public class Main extends JPanel implements MouseMotionListener
 
 
         // Red background
-        g.setColor(Color.BLACK);
+        g.setColor(Color.RED);
         g.fillRect(0, 0, getWidth(), getHeight());
 
 
@@ -238,120 +246,140 @@ public class Main extends JPanel implements MouseMotionListener
             int imgX = 10;
             int imgY = 10;
             g.drawImage(appleImage, imgX, imgY, 50, 50, this);
+            g.drawString("Apple", 80, 45);
         }
         if (apple_pieImage != null) {
             // Example: draw on the left side, with a 10px margin
             int imgX = 150;
             int imgY = 10;
             g.drawImage(apple_pieImage, imgX, imgY, 50, 50, this);
+            g.drawString("Apple Pie", 220, 45);
         }
         if (avocadoImage != null) {
 //             // Example: draw on the left side, with a 10px margin
             int imgX = 10;
             int imgY = 110;
             g.drawImage(avocadoImage, imgX, imgY, 50, 50, this);
+            g.drawString("Avocado", 80, 145);
         }
         if (boar_headImage != null) {
             // Example: draw on the left side, with a 10px margin
             int imgX = 150;
             int imgY = 110;
             g.drawImage(boar_headImage, imgX, imgY, 50, 50, this);
+            g.drawString("Boar Head", 220, 145);
         }
         if (breadImage != null) {
             // Example: draw on the left side, with a 10px margin
             int imgX = 10;
             int imgY = 210;
             g.drawImage(breadImage, imgX, imgY, 50, 50, this);
+            g.drawString("Bread", 80, 245);
         }
         if (cheeseImage != null) {
             // Example: draw on the left side, with a 10px margin
             int imgX = 150;
             int imgY = 210;
             g.drawImage(cheeseImage, imgX, imgY, 50, 50, this);
+            g.drawString("Cheese", 220, 245);
         }
         if (cheesecakeImage != null) {
             // Example: draw on the left side, with a 10px margin
             int imgX = 10;
             int imgY = 310;
             g.drawImage(cheesecakeImage, imgX, imgY, 50, 50, this);
+            g.drawString("Cheesecake", 80, 345);
         }
         if (chickenImage != null) {
             // Example: draw on the left side, with a 10px margin
             int imgX = 150;
             int imgY = 310;
             g.drawImage(chickenImage, imgX, imgY, 50, 50, this);
+            g.drawString("Chicken", 220, 345);
         }
         if (cookieImage != null) {
 //             // Example: draw on the left side, with a 10px margin
             int imgX = 10;
             int imgY = 410;
             g.drawImage(cookieImage, imgX, imgY, 50, 50, this);
+            g.drawString("Cookie", 80, 445);
         }
         if (dragon_fruitImage != null) {
 //             // Example: draw on the left side, with a 10px margin
             int imgX = 150;
             int imgY = 410;
             g.drawImage(dragon_fruitImage, imgX, imgY, 50, 50, this);
+            g.drawString("Dragon Fruit", 220, 445);
         }
         if (fishImage != null) {
 //             // Example: draw on the left side, with a 10px margin
             int imgX = 10;
             int imgY = 510;
             g.drawImage(fishImage, imgX, imgY, 50, 50, this);
+            g.drawString("Fish", 80, 545);
         }
         if (fried_eggsImage != null) {
 //             // Example: draw on the left side, with a 10px margin
             int imgX = 150;
             int imgY = 510;
             g.drawImage(fried_eggsImage, imgX, imgY, 50, 50, this);
+            g.drawString("Fried Eggs", 220, 545);
         }
         if (honeyImage != null) {
 //             // Example: draw on the left side, with a 10px margin
             int imgX = 10;
             int imgY = 610;
             g.drawImage(honeyImage, imgX, imgY, 50, 50, this);
+            g.drawString("Honey", 80, 645);
         }
         if (pineappleImage != null) {
 //             // Example: draw on the left side, with a 10px margin
             int imgX = 150;
             int imgY = 610;
             g.drawImage(pineappleImage, imgX, imgY, 50, 50, this);
+            g.drawString("Pineapple", 220, 645);
         }
         if (pretzelImage != null) {
 //             // Example: draw on the left side, with a 10px margin
             int imgX = 10;
             int imgY = 710;
             g.drawImage(pretzelImage, imgX, imgY, 50, 50, this);
+            g.drawString("Pretzel", 80, 745);
         }
         if (pumpkin_pieImage != null) {
 //             // Example: draw on the left side, with a 10px margin
             int imgX = 150;
             int imgY = 710;
             g.drawImage(pumpkin_pieImage, imgX, imgY, 50, 50, this);
+            g.drawString("Pumpkin Pie", 220, 745);
         }
         if (shrimpImage != null) {
 //             // Example: draw on the left side, with a 10px margin
             int imgX = 10;
             int imgY = 810;
             g.drawImage(shrimpImage, imgX, imgY, 50, 50, this);
+            g.drawString("Shrimp", 80, 845);
         }
         if (sushiImage != null) {
 //             // Example: draw on the left side, with a 10px margin
             int imgX = 150;
             int imgY = 810;
             g.drawImage(sushiImage, imgX, imgY, 50, 50, this);
+            g.drawString("Sushi", 220, 845);
         }
         if (tboneImage != null) {
 //             // Example: draw on the left side, with a 10px margin
             int imgX = 10;
             int imgY = 910;
             g.drawImage(tboneImage, imgX, imgY, 50, 50, this);
+            g.drawString("T-Bone", 80, 945);
         }
         if (watermelonImage != null) {
 //             // Example: draw on the left side, with a 10px margin
             int imgX = 150;
             int imgY = 910;
             g.drawImage(watermelonImage, imgX, imgY, 50, 50, this);
+            g.drawString("Watermelon", 220, 945);
         }
         if (man_idle != null) {
 //             // Example: draw on the left side, with a 10px margin
@@ -494,14 +522,7 @@ public class Main extends JPanel implements MouseMotionListener
             
             panel.man_idle = new Imagesfood("man_idle");
             panel.man_idleImage = panel.man_idle.getImage();
-          // JLabel label = new JLabel("This is a label with static text.");
-          //   frame.add(label);
-
-          //   // Using a JTextField to display editable or dynamic text
-          //   JTextField textField = new JTextField("Initial text in a text field", 20);
-          //   frame.add(textField);
-
-          //   frame.setVisible(true);
+          
         });
         // Repaint happens after image load in the EDT
 
