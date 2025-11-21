@@ -11,7 +11,7 @@ public class Main extends JPanel implements MouseMotionListener
   public Main() {
         addMouseMotionListener(this);
     }
-    private BufferedImage appleImage = null;
+        private BufferedImage appleImage = null;
         private Imagesfood apple;
         private BufferedImage apple_pieImage = null;
         private Imagesfood apple_pie;
