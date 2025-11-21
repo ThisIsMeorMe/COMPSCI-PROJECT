@@ -237,121 +237,121 @@ public class Main extends JPanel implements MouseMotionListener
 //             // Example: draw on the left side, with a 10px margin
             int imgX = 10;
             int imgY = 10;
-            g.drawImage(appleImage, imgX, imgY, this);
+            g.drawImage(appleImage, imgX, imgY, 50, 50, this);
         }
         if (apple_pieImage != null) {
             // Example: draw on the left side, with a 10px margin
-            int imgX = 50;
+            int imgX = 150;
             int imgY = 10;
-            g.drawImage(apple_pieImage, imgX, imgY, this);
+            g.drawImage(apple_pieImage, imgX, imgY, 50, 50, this);
         }
         if (avocadoImage != null) {
 //             // Example: draw on the left side, with a 10px margin
-            int imgX = 100;
-            int imgY = 10;
-            g.drawImage(avocadoImage, imgX, imgY, this);
+            int imgX = 10;
+            int imgY = 110;
+            g.drawImage(avocadoImage, imgX, imgY, 50, 50, this);
         }
         if (boar_headImage != null) {
             // Example: draw on the left side, with a 10px margin
             int imgX = 150;
-            int imgY = 10;
-            g.drawImage(boar_headImage, imgX, imgY, this);
+            int imgY = 110;
+            g.drawImage(boar_headImage, imgX, imgY, 50, 50, this);
         }
         if (breadImage != null) {
             // Example: draw on the left side, with a 10px margin
-            int imgX = 200;
-            int imgY = 10;
-            g.drawImage(breadImage, imgX, imgY, this);
+            int imgX = 10;
+            int imgY = 210;
+            g.drawImage(breadImage, imgX, imgY, 50, 50, this);
         }
         if (cheeseImage != null) {
             // Example: draw on the left side, with a 10px margin
-            int imgX = 250;
-            int imgY = 10;
-            g.drawImage(cheeseImage, imgX, imgY, this);
+            int imgX = 150;
+            int imgY = 210;
+            g.drawImage(cheeseImage, imgX, imgY, 50, 50, this);
         }
         if (cheesecakeImage != null) {
             // Example: draw on the left side, with a 10px margin
-            int imgX = 300;
-            int imgY = 10;
-            g.drawImage(cheesecakeImage, imgX, imgY, this);
+            int imgX = 10;
+            int imgY = 310;
+            g.drawImage(cheesecakeImage, imgX, imgY, 50, 50, this);
         }
         if (chickenImage != null) {
             // Example: draw on the left side, with a 10px margin
-            int imgX = 350;
-            int imgY = 10;
-            g.drawImage(chickenImage, imgX, imgY, this);
+            int imgX = 150;
+            int imgY = 310;
+            g.drawImage(chickenImage, imgX, imgY, 50, 50, this);
         }
         if (cookieImage != null) {
 //             // Example: draw on the left side, with a 10px margin
-            int imgX = 400;
-            int imgY = 10;
-            g.drawImage(cookieImage, imgX, imgY, this);
+            int imgX = 10;
+            int imgY = 410;
+            g.drawImage(cookieImage, imgX, imgY, 50, 50, this);
         }
         if (dragon_fruitImage != null) {
 //             // Example: draw on the left side, with a 10px margin
-            int imgX = 450;
-            int imgY = 10;
-            g.drawImage(dragon_fruitImage, imgX, imgY, this);
+            int imgX = 150;
+            int imgY = 410;
+            g.drawImage(dragon_fruitImage, imgX, imgY, 50, 50, this);
         }
         if (fishImage != null) {
 //             // Example: draw on the left side, with a 10px margin
-            int imgX = 500;
-            int imgY = 10;
-            g.drawImage(fishImage, imgX, imgY, this);
+            int imgX = 10;
+            int imgY = 510;
+            g.drawImage(fishImage, imgX, imgY, 50, 50, this);
         }
         if (fried_eggsImage != null) {
 //             // Example: draw on the left side, with a 10px margin
-            int imgX = 550;
-            int imgY = 10;
-            g.drawImage(fried_eggsImage, imgX, imgY, this);
+            int imgX = 150;
+            int imgY = 510;
+            g.drawImage(fried_eggsImage, imgX, imgY, 50, 50, this);
         }
         if (honeyImage != null) {
 //             // Example: draw on the left side, with a 10px margin
-            int imgX = 600;
-            int imgY = 10;
-            g.drawImage(honeyImage, imgX, imgY, this);
+            int imgX = 10;
+            int imgY = 610;
+            g.drawImage(honeyImage, imgX, imgY, 50, 50, this);
         }
         if (pineappleImage != null) {
 //             // Example: draw on the left side, with a 10px margin
-            int imgX = 650;
-            int imgY = 10;
-            g.drawImage(pineappleImage, imgX, imgY, this);
+            int imgX = 150;
+            int imgY = 610;
+            g.drawImage(pineappleImage, imgX, imgY, 50, 50, this);
         }
         if (pretzelImage != null) {
 //             // Example: draw on the left side, with a 10px margin
-            int imgX = 700;
-            int imgY = 10;
-            g.drawImage(pretzelImage, imgX, imgY, this);
+            int imgX = 10;
+            int imgY = 710;
+            g.drawImage(pretzelImage, imgX, imgY, 50, 50, this);
         }
         if (pumpkin_pieImage != null) {
 //             // Example: draw on the left side, with a 10px margin
-            int imgX = 10;
-            int imgY = 50;
-            g.drawImage(pumpkin_pieImage, imgX, imgY, this);
+            int imgX = 150;
+            int imgY = 710;
+            g.drawImage(pumpkin_pieImage, imgX, imgY, 50, 50, this);
         }
         if (shrimpImage != null) {
 //             // Example: draw on the left side, with a 10px margin
-            int imgX = 50;
-            int imgY = 50;
-            g.drawImage(shrimpImage, imgX, imgY, this);
+            int imgX = 10;
+            int imgY = 810;
+            g.drawImage(shrimpImage, imgX, imgY, 50, 50, this);
         }
         if (sushiImage != null) {
 //             // Example: draw on the left side, with a 10px margin
-            int imgX = 100;
-            int imgY = 50;
-            g.drawImage(sushiImage, imgX, imgY, this);
+            int imgX = 150;
+            int imgY = 810;
+            g.drawImage(sushiImage, imgX, imgY, 50, 50, this);
         }
         if (tboneImage != null) {
 //             // Example: draw on the left side, with a 10px margin
-            int imgX = 150;
-            int imgY = 50;
-            g.drawImage(tboneImage, imgX, imgY, this);
+            int imgX = 10;
+            int imgY = 910;
+            g.drawImage(tboneImage, imgX, imgY, 50, 50, this);
         }
         if (watermelonImage != null) {
 //             // Example: draw on the left side, with a 10px margin
-            int imgX = 200;
-            int imgY = 50;
-            g.drawImage(watermelonImage, imgX, imgY, this);
+            int imgX = 150;
+            int imgY = 910;
+            g.drawImage(watermelonImage, imgX, imgY, 50, 50, this);
         }
         if (man_idle != null) {
 //             // Example: draw on the left side, with a 10px margin
