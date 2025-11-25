@@ -17,14 +17,32 @@ public class Imagesfood {
     public Imagesfood(String imagename) {
         this.name = imagename;
         try {
-            // Load from assets/images relative to project root
-            // Get the project root by going up from src/ directory
-            String projectRoot = System.getProperty("user.dir");
-            String imagePath = projectRoot + "/assets/images/" + imagename + ".png";
-            this.image = ImageIO.read(new File(imagePath));
+            // Try multiple possible paths for assets/images
+            String[] possiblePaths = {
+                "assets/images/" + imagename + ".png",
+                "../assets/images/" + imagename + ".png",
+                "../../assets/images/" + imagename + ".png",
+                System.getProperty("user.dir") + "/assets/images/" + imagename + ".png",
+                System.getProperty("user.dir") + "/COMPSCI-PROJECT-main677777/assets/images/" + imagename + ".png"
+            };
+            
+            File imageFile = null;
+            for (String path : possiblePaths) {
+                File f = new File(path);
+                if (f.exists()) {
+                    imageFile = f;
+                    break;
+                }
+            }
+            
+            if (imageFile != null) {
+                this.image = ImageIO.read(imageFile);
+            } else {
+                System.err.println("Failed to find image for: " + imagename + " in any of the expected locations");
+                this.image = null;
+            }
         } catch (IOException ex) {
-            // If loading fails, print a helpful error and leave image null
-            System.err.println("Failed to load image for: " + imagename + " - tried: " + System.getProperty("user.dir") + "/assets/images/" + imagename + ".png");
+            System.err.println("Failed to load image for: " + imagename);
             ex.printStackTrace();
             this.image = null;
         }
