@@ -1,66 +1,70 @@
+//  IMPORTS
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import javax.swing.*;
 
 
-
-
 public class Main extends JPanel implements MouseMotionListener
 {
+  // The variables store coordiates 
   private int mouseX = -10;
   private int mouseY = -10;
-  public Main() {
-        addMouseMotionListener(this);
-    }
-    public class testmouse {
-     public static void main(String[] args){
-         int mouseY = MouseInfo.getPointerInfo().getLocation().y;
-          int mouseX = MouseInfo.getPointerInfo().getLocation().x;
-         } 
-        }
-        private BufferedImage appleImage = null;
-        private Imagesfood apple;
-        private BufferedImage apple_pieImage = null;
-        private Imagesfood apple_pie;
-        private BufferedImage avocadoImage = null;
-        private Imagesfood avocado;
-        private BufferedImage boar_headImage = null;
-        private Imagesfood boar_head;
-        private BufferedImage breadImage = null;
-        private Imagesfood bread;
-        private BufferedImage cheeseImage = null;
-        private Imagesfood cheese;
-        private BufferedImage cheesecakeImage = null;
-        private Imagesfood cheesecake;
-        private BufferedImage chickenImage = null;
-        private Imagesfood chicken;
-        private BufferedImage cookieImage = null;
-        private Imagesfood cookie;
-        private BufferedImage dragon_fruitImage = null;
-        private Imagesfood dragon_fruit;
-        private BufferedImage fishImage = null;
-        private Imagesfood fish;
-        private BufferedImage fried_eggsImage = null;
-        private Imagesfood fried_eggs;
-        private BufferedImage honeyImage = null;
-        private Imagesfood honey;
-        private BufferedImage pineappleImage = null;
-        private Imagesfood pineapple;
-        private BufferedImage pretzelImage = null;
-        private Imagesfood pretzel;
-        private BufferedImage pumpkin_pieImage = null;
-        private Imagesfood pumpkin_pie;
-        private BufferedImage shrimpImage = null;
-        private Imagesfood shrimp;
-        private BufferedImage sushiImage = null;
-        private Imagesfood sushi;
-        private BufferedImage tboneImage = null;
-        private Imagesfood tbone;
-        private BufferedImage watermelonImage = null;
-        private Imagesfood watermelon;
-        private BufferedImage man_idleImage = null;
-        private Imagesfood man_idle;
+  public Main()
+  {
+    addMouseMotionListener(this);
+  }
+  public class testmouse
+  {
+    public static void main(String[] args)
+    {
+      int mouseY = MouseInfo.getPointerInfo().getLocation().y;
+      int mouseX = MouseInfo.getPointerInfo().getLocation().x;
+    } 
+  }
+  
+  private BufferedImage appleImage = null;
+  private Imagesfood apple;
+  private BufferedImage apple_pieImage = null;
+  private Imagesfood apple_pie;
+  private BufferedImage avocadoImage = null;
+  private Imagesfood avocado;
+  private BufferedImage boar_headImage = null;
+  private Imagesfood boar_head;
+  private BufferedImage breadImage = null;
+  private Imagesfood bread;
+  private BufferedImage cheeseImage = null;
+  private Imagesfood cheese;
+  private BufferedImage cheesecakeImage = null;
+  private Imagesfood cheesecake;
+  private BufferedImage chickenImage = null;
+  private Imagesfood chicken;
+  private BufferedImage cookieImage = null;
+  private Imagesfood cookie;
+  private BufferedImage dragon_fruitImage = null;
+  private Imagesfood dragon_fruit;
+  private BufferedImage fishImage = null;
+  private Imagesfood fish;
+  private BufferedImage fried_eggsImage = null;
+  private Imagesfood fried_eggs;
+  private BufferedImage honeyImage = null;
+  private Imagesfood honey;
+  private BufferedImage pineappleImage = null;
+  private Imagesfood pineapple;
+  private BufferedImage pretzelImage = null;
+  private Imagesfood pretzel;
+  private BufferedImage pumpkin_pieImage = null;
+  private Imagesfood pumpkin_pie;
+  private BufferedImage shrimpImage = null;
+  private Imagesfood shrimp;
+  private BufferedImage sushiImage = null;
+  private Imagesfood sushi;
+  private BufferedImage tboneImage = null;
+  private Imagesfood tbone;
+  private BufferedImage watermelonImage = null;
+  private Imagesfood watermelon;
+  private BufferedImage man_idleImage = null;
+  private Imagesfood man_idle;
         
 
         // Image loaded via Imagesfood
