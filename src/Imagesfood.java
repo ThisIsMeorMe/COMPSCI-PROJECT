@@ -18,10 +18,13 @@ public class Imagesfood {
         this.name = imagename;
         try {
             // Load from assets/images relative to project root
-            this.image = ImageIO.read(new File("assets/images/" + imagename + ".png"));
+            // Get the project root by going up from src/ directory
+            String projectRoot = System.getProperty("user.dir");
+            String imagePath = projectRoot + "/assets/images/" + imagename + ".png";
+            this.image = ImageIO.read(new File(imagePath));
         } catch (IOException ex) {
             // If loading fails, print a helpful error and leave image null
-            System.err.println("Failed to load image for: " + imagename + " - expected assets/images/" + imagename + ".png");
+            System.err.println("Failed to load image for: " + imagename + " - tried: " + System.getProperty("user.dir") + "/assets/images/" + imagename + ".png");
             ex.printStackTrace();
             this.image = null;
         }
