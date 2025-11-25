@@ -308,27 +308,14 @@ public class Main extends JPanel implements MouseMotionListener
 
     if (man_idleImage != null)
     {
-      int imgX = 1410;
-      int imgY = 644;
+      int imgX = 1300;
+      int imgY = 520;
       // draw at its own image size but scaled to virtual coords
       drawVirtualImage(g, man_idleImage, imgX, imgY, man_idleImage.getWidth(), man_idleImage.getHeight());
     }
 
-    // Draw cursor image at mouse position LAST (on top of everything)
-    // Scale cursor to 1/8 of its original size
-    if (cursorImage != null)
-    {
-      int cW = Math.max(1, (int) Math.round(cursorImage.getWidth() * scale / 8.0));
-      int cH = Math.max(1, (int) Math.round(cursorImage.getHeight() * scale / 8.0));
-      int cx = mouseX - cW/2;
-      int cy = mouseY - cH/2;
-      g.drawImage(cursorImage, cx, cy, cW, cH, this);
-    }
-    else
-    {
-      g.setColor(Color.BLACK);
-      g.fillOval(mouseX - 7, mouseY - 7, 15, 15);
-    }
+    // No custom cursor image — let the system cursor be used.
+    // (Cursor-follow image removed.)
   }
 
   // Helper: draw a buffered image positioned/sized in virtual coordinates
@@ -441,8 +428,7 @@ public class Main extends JPanel implements MouseMotionListener
             panel.man_idle = new Imagesfood("man_idle");
             panel.man_idleImage = panel.man_idle.getImage();
 
-            panel.cursor = new Imagesfood("cursor");
-            panel.cursorImage = panel.cursor.getImage();
+            // cursor image removed - use system cursor instead
 
             // Debug: print which images loaded successfully
             System.out.println("Image load status:");
