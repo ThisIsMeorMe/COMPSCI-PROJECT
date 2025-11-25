@@ -38,8 +38,6 @@ public class Main extends JPanel implements MouseMotionListener
   {
     return mouseY;
   }
-}
-
   
   private BufferedImage appleImage = null;
   private Imagesfood apple;
@@ -88,6 +86,9 @@ public class Main extends JPanel implements MouseMotionListener
   private int lastScaledW = -1;
   private int lastScaledH = -1;
   private Imagesfood store;
+  // Virtual design resolution the UI is laid out in
+  private static final int VIRTUAL_WIDTH = 1535;
+  private static final int VIRTUAL_HEIGHT = 830;
 
 
 
@@ -103,191 +104,245 @@ public class Main extends JPanel implements MouseMotionListener
     g.setColor(Color.BLACK);
     g.fillOval(mouseX - 15, mouseY - 15, 30, 30);
 
+    // Precompute virtual -> actual scale and offsets so all drawings
+    // keep locked positions relative to a 1535x830 design resolution.
+    int panelW = getWidth();
+    int panelH = getHeight();
+    double scale = Math.min((double) panelW / VIRTUAL_WIDTH, (double) panelH / VIRTUAL_HEIGHT);
+    int offsetX = (int) Math.round((panelW - VIRTUAL_WIDTH * scale) / 2.0);
+    int offsetY = (int) Math.round((panelH - VIRTUAL_HEIGHT * scale) / 2.0);
+
     // Renders all the images
     if (storeImageOriginal != null)
     {
-      int margin = 10;
-      int availW = Math.max(1, getWidth() - margin * 2);
-      int availH = Math.max(1, getHeight() - margin * 2);
-      int imgW = storeImageOriginal.getWidth();
-      int imgH = storeImageOriginal.getHeight();
-      double ratio = Math.min((double) availW / imgW, (double) availH / imgH);
-      int targetW = Math.max(1, (int) Math.round(imgW * ratio));
-      int targetH = Math.max(1, (int) Math.round(imgH * ratio));
-
-      // Only rescale when panel size  changes
-      if (targetW != lastScaledW || targetH != lastScaledH || storeImageScaled == null)
-      {
-        storeImageScaled = getScaledImage(storeImageOriginal, targetW, targetH);
-        lastScaledW = targetW;
-        lastScaledH = targetH;
-      }
-
-      int imgX = (getWidth() - targetW) / 2;
-      int imgY = (getHeight() - targetH) / 2;
-      if (storeImageScaled != null)
-      {
-        g.drawImage(storeImageScaled, imgX, imgY, null);
-      }
+      // Draw store background to fill the virtual design area (0,0)-(VIRTUAL_WIDTH,VIRTUAL_HEIGHT)
+      drawVirtualImage(g, storeImageOriginal, 0, 0, VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
     }
         
+    // Layout constants for the item list
+    final int V_IMG_W = 50;
+    final int V_IMG_H = 50;
+    // moved 25px right and 15px down from original values (small extra nudge to the right)
+    final int leftX = 35;
+    final int rightX = 175;
+    final int startY = 25;
+    // slightly increased vertical spacing for a bit more room
+    final int rowSpacing = 78;
+
     if (appleImage != null)
     {
-      int imgX = 10;
-      int imgY = 10;
-      g.drawImage(appleImage, imgX, imgY, 50, 50, this);
-      g.drawString("Apple", 80, 45);
+      int row = 0;
+      int imgX = leftX;
+      int imgY = startY + row * rowSpacing;
+      drawVirtualImage(g, appleImage, imgX, imgY, V_IMG_W, V_IMG_H);
+      drawVirtualString(g, "Apple", imgX + V_IMG_W + 8, imgY + 35);
     }
     if (apple_pieImage != null)
     {
-      int imgX = 150;
-      int imgY = 10;
-      g.drawImage(apple_pieImage, imgX, imgY, 50, 50, this);
-      g.drawString("Apple Pie", 220, 45);
+      int row = 0;
+      int imgX = rightX;
+      int imgY = startY + row * rowSpacing;
+      drawVirtualImage(g, apple_pieImage, imgX, imgY, V_IMG_W, V_IMG_H);
+      drawVirtualString(g, "Apple Pie", imgX + V_IMG_W + 8, imgY + 35);
     }
     if (avocadoImage != null)
     {
-      int imgX = 10;
-      int imgY = 110;
-      g.drawImage(avocadoImage, imgX, imgY, 50, 50, this);  
-      g.drawString("Avocado", 80, 145);
+      int row = 1;
+      int imgX = leftX;
+      int imgY = startY + row * rowSpacing;
+      drawVirtualImage(g, avocadoImage, imgX, imgY, V_IMG_W, V_IMG_H);
+      drawVirtualString(g, "Avocado", imgX + V_IMG_W + 8, imgY + 35);
     }
     if (boar_headImage != null)
     {
-      int imgX = 150;
-      int imgY = 110;
-      g.drawImage(boar_headImage, imgX, imgY, 50, 50, this);
-      g.drawString("Boar Head", 220, 145);
+      int row = 1;
+      int imgX = rightX;
+      int imgY = startY + row * rowSpacing;
+      drawVirtualImage(g, boar_headImage, imgX, imgY, V_IMG_W, V_IMG_H);
+      drawVirtualString(g, "Boar Head", imgX + V_IMG_W + 8, imgY + 35);
     }
     if (breadImage != null)
     {
-      int imgX = 10;
-      int imgY = 210;
-      g.drawImage(breadImage, imgX, imgY, 50, 50, this);
-      g.drawString("Bread", 80, 245);
+      int row = 2;
+      int imgX = leftX;
+      int imgY = startY + row * rowSpacing;
+      drawVirtualImage(g, breadImage, imgX, imgY, V_IMG_W, V_IMG_H);
+      drawVirtualString(g, "Bread", imgX + V_IMG_W + 8, imgY + 35);
     }
     if (cheeseImage != null)
     {
-      int imgX = 150;
-      int imgY = 210;
-      g.drawImage(cheeseImage, imgX, imgY, 50, 50, this);
-      g.drawString("Cheese", 220, 245);
+      int row = 2;
+      int imgX = rightX;
+      int imgY = startY + row * rowSpacing;
+      drawVirtualImage(g, cheeseImage, imgX, imgY, V_IMG_W, V_IMG_H);
+      drawVirtualString(g, "Cheese", imgX + V_IMG_W + 8, imgY + 35);
     }
     if (cheesecakeImage != null)
     {
-      int imgX = 10;
-      int imgY = 310;
-      g.drawImage(cheesecakeImage, imgX, imgY, 50, 50, this);
-      g.drawString("Cheesecake", 80, 345);
+      int row = 3;
+      int imgX = leftX;
+      int imgY = startY + row * rowSpacing;
+      drawVirtualImage(g, cheesecakeImage, imgX, imgY, V_IMG_W, V_IMG_H);
+      drawVirtualString(g, "Cheesecake", imgX + V_IMG_W + 8, imgY + 35);
     }
     if (chickenImage != null)
     {
-      int imgX = 150;
-      int imgY = 310;
-      g.drawImage(chickenImage, imgX, imgY, 50, 50, this); 
-      g.drawString("Chicken", 220, 345);
+      int row = 3;
+      int imgX = rightX;
+      int imgY = startY + row * rowSpacing;
+      drawVirtualImage(g, chickenImage, imgX, imgY, V_IMG_W, V_IMG_H);
+      drawVirtualString(g, "Chicken", imgX + V_IMG_W + 8, imgY + 35);
     }
     if (cookieImage != null)
     {
-      int imgX = 10;
-      int imgY = 410;
-      g.drawImage(cookieImage, imgX, imgY, 50, 50, this);
-      g.drawString("Cookie", 80, 445);
+      int row = 4;
+      int imgX = leftX;
+      int imgY = startY + row * rowSpacing;
+      drawVirtualImage(g, cookieImage, imgX, imgY, V_IMG_W, V_IMG_H);
+      drawVirtualString(g, "Cookie", imgX + V_IMG_W + 8, imgY + 35);
     }
     if (dragon_fruitImage != null)
     {
-      int imgX = 150;
-      int imgY = 410;
-      g.drawImage(dragon_fruitImage, imgX, imgY, 50, 50, this);
-      g.drawString("Dragon Fruit", 220, 445);
+      int row = 4;
+      int imgX = rightX;
+      int imgY = startY + row * rowSpacing;
+      drawVirtualImage(g, dragon_fruitImage, imgX, imgY, V_IMG_W, V_IMG_H);
+      drawVirtualString(g, "Dragon Fruit", imgX + V_IMG_W + 8, imgY + 35);
     }
 
     if (fishImage != null)
     {
-      int imgX = 10;
-      int imgY = 510;
-      g.drawImage(fishImage, imgX, imgY, 50, 50, this);
-      g.drawString("Fish", 80, 545);
+      int row = 5;
+      int imgX = leftX;
+      int imgY = startY + row * rowSpacing;
+      drawVirtualImage(g, fishImage, imgX, imgY, V_IMG_W, V_IMG_H);
+      drawVirtualString(g, "Fish", imgX + V_IMG_W + 8, imgY + 35);
     }
 
     if (fried_eggsImage != null)
     {
-      int imgX = 150;
-      int imgY = 510;
-      g.drawImage(fried_eggsImage, imgX, imgY, 50, 50, this);
-      g.drawString("Fried Eggs", 220, 545);
+      int row = 5;
+      int imgX = rightX;
+      int imgY = startY + row * rowSpacing;
+      drawVirtualImage(g, fried_eggsImage, imgX, imgY, V_IMG_W, V_IMG_H);
+      drawVirtualString(g, "Fried Eggs", imgX + V_IMG_W + 8, imgY + 35);
     }
 
     if (honeyImage != null)
     {
-      int imgX = 10;
-      int imgY = 610;
-      g.drawImage(honeyImage, imgX, imgY, 50, 50, this);
-      g.drawString("Honey", 80, 645);
+      int row = 6;
+      int imgX = leftX;
+      int imgY = startY + row * rowSpacing;
+      drawVirtualImage(g, honeyImage, imgX, imgY, V_IMG_W, V_IMG_H);
+      drawVirtualString(g, "Honey", imgX + V_IMG_W + 8, imgY + 35);
     }
 
     if (pineappleImage != null)
     {
-      int imgX = 150;
-      int imgY = 610;
-      g.drawImage(pineappleImage, imgX, imgY, 50, 50, this);
-      g.drawString("Pineapple", 220, 645);
+      int row = 6;
+      int imgX = rightX;
+      int imgY = startY + row * rowSpacing;
+      drawVirtualImage(g, pineappleImage, imgX, imgY, V_IMG_W, V_IMG_H);
+      drawVirtualString(g, "Pineapple", imgX + V_IMG_W + 8, imgY + 35);
     }
 
     if (pretzelImage != null)
     {
-      int imgX = 10;
-      int imgY = 710;
-      g.drawImage(pretzelImage, imgX, imgY, 50, 50, this);
-      g.drawString("Pretzel", 80, 745);
+      int row = 7;
+      int imgX = leftX;
+      int imgY = startY + row * rowSpacing;
+      drawVirtualImage(g, pretzelImage, imgX, imgY, V_IMG_W, V_IMG_H);
+      drawVirtualString(g, "Pretzel", imgX + V_IMG_W + 8, imgY + 35);
     }
 
     if (pumpkin_pieImage != null)
     {
-      int imgX = 150;
-      int imgY = 710;
-      g.drawImage(pumpkin_pieImage, imgX, imgY, 50, 50, this);
-      g.drawString("Pumpkin Pie", 220, 745);
+      int row = 7;
+      int imgX = rightX;
+      int imgY = startY + row * rowSpacing;
+      drawVirtualImage(g, pumpkin_pieImage, imgX, imgY, V_IMG_W, V_IMG_H);
+      drawVirtualString(g, "Pumpkin Pie", imgX + V_IMG_W + 8, imgY + 35);
     }
 
     if (shrimpImage != null)
     {
-      int imgX = 10;
-      int imgY = 810;
-      g.drawImage(shrimpImage, imgX, imgY, 50, 50, this);
-      g.drawString("Shrimp", 80, 845);
+      int row = 8;
+      int imgX = leftX;
+      int imgY = startY + row * rowSpacing;
+      drawVirtualImage(g, shrimpImage, imgX, imgY, V_IMG_W, V_IMG_H);
+      drawVirtualString(g, "Shrimp", imgX + V_IMG_W + 8, imgY + 35);
     }
     
     if (sushiImage != null)
     {
-      int imgX = 150;
-      int imgY = 810;
-      g.drawImage(sushiImage, imgX, imgY, 50, 50, this);
-      g.drawString("Sushi", 220, 845);
+      int row = 8;
+      int imgX = rightX;
+      int imgY = startY + row * rowSpacing;
+      drawVirtualImage(g, sushiImage, imgX, imgY, V_IMG_W, V_IMG_H);
+      drawVirtualString(g, "Sushi", imgX + V_IMG_W + 8, imgY + 35);
     }
 
     if (tboneImage != null)
     {
-      int imgX = 10;
-      int imgY = 910;
-      g.drawImage(tboneImage, imgX, imgY, 50, 50, this);
-      g.drawString("T-Bone", 80, 945);
+      int row = 9;
+      int imgX = leftX;
+      int imgY = startY + row * rowSpacing;
+      drawVirtualImage(g, tboneImage, imgX, imgY, V_IMG_W, V_IMG_H);
+      drawVirtualString(g, "T-Bone", imgX + V_IMG_W + 8, imgY + 35);
     }
     
     if (watermelonImage != null)
     {
-      int imgX = 150;
-      int imgY = 910;
-      g.drawImage(watermelonImage, imgX, imgY, 50, 50, this);
-      g.drawString("Watermelon", 220, 945);
+      int row = 9;
+      int imgX = rightX;
+      int imgY = startY + row * rowSpacing;
+      drawVirtualImage(g, watermelonImage, imgX, imgY, V_IMG_W, V_IMG_H);
+      drawVirtualString(g, "Watermelon", imgX + V_IMG_W + 8, imgY + 35);
     }
 
     if (man_idleImage != null)
     {
       int imgX = 1410;
       int imgY = 644;
-      g.drawImage(man_idleImage, imgX, imgY, this);
+      // draw at its own image size but scaled to virtual coords
+      drawVirtualImage(g, man_idleImage, imgX, imgY, man_idleImage.getWidth(), man_idleImage.getHeight());
     }
+  }
+
+  // Helper: draw a buffered image positioned/sized in virtual coordinates
+  private void drawVirtualImage(Graphics g, BufferedImage img, int vx, int vy, int vWidth, int vHeight)
+  {
+    if (img == null) return;
+    int panelW = getWidth();
+    int panelH = getHeight();
+    double scale = Math.min((double) panelW / VIRTUAL_WIDTH, (double) panelH / VIRTUAL_HEIGHT);
+    int offsetX = (int) Math.round((panelW - VIRTUAL_WIDTH * scale) / 2.0);
+    int offsetY = (int) Math.round((panelH - VIRTUAL_HEIGHT * scale) / 2.0);
+    int ax = offsetX + (int) Math.round(vx * scale);
+    int ay = offsetY + (int) Math.round(vy * scale);
+    int aw = Math.max(1, (int) Math.round(vWidth * scale));
+    int ah = Math.max(1, (int) Math.round(vHeight * scale));
+    g.drawImage(img, ax, ay, aw, ah, this);
+  }
+
+  // Helper: draw text anchored at virtual coordinates
+  private void drawVirtualString(Graphics g, String text, int vx, int vy)
+  {
+    int panelW = getWidth();
+    int panelH = getHeight();
+    double scale = Math.min((double) panelW / VIRTUAL_WIDTH, (double) panelH / VIRTUAL_HEIGHT);
+    int offsetX = (int) Math.round((panelW - VIRTUAL_WIDTH * scale) / 2.0);
+    int offsetY = (int) Math.round((panelH - VIRTUAL_HEIGHT * scale) / 2.0);
+    int ax = offsetX + (int) Math.round(vx * scale);
+    int ay = offsetY + (int) Math.round(vy * scale);
+    Graphics2D g2 = (Graphics2D) g;
+    Font oldFont = g2.getFont();
+    // Make the font double size for these labels
+    Font bigFont = oldFont.deriveFont(oldFont.getSize2D() * 2f);
+    g2.setFont(bigFont);
+    g2.drawString(text, ax, ay);
+    // restore original font
+    g2.setFont(oldFont);
   }
 
     private BufferedImage getScaledImage(BufferedImage src, int targetW, int targetH) {
@@ -360,6 +415,31 @@ public class Main extends JPanel implements MouseMotionListener
             
             panel.man_idle = new Imagesfood("man_idle");
             panel.man_idleImage = panel.man_idle.getImage();
+
+            // Debug: print which images loaded successfully
+            System.out.println("Image load status:");
+            System.out.println("store=" + (panel.storeImageOriginal != null));
+            System.out.println("apple=" + (panel.appleImage != null));
+            System.out.println("apple_pie=" + (panel.apple_pieImage != null));
+            System.out.println("avocado=" + (panel.avocadoImage != null));
+            System.out.println("boar_head=" + (panel.boar_headImage != null));
+            System.out.println("bread=" + (panel.breadImage != null));
+            System.out.println("cheese=" + (panel.cheeseImage != null));
+            System.out.println("cheesecake=" + (panel.cheesecakeImage != null));
+            System.out.println("chicken=" + (panel.chickenImage != null));
+            System.out.println("cookie=" + (panel.cookieImage != null));
+            System.out.println("dragon_fruit=" + (panel.dragon_fruitImage != null));
+            System.out.println("fish=" + (panel.fishImage != null));
+            System.out.println("fried_eggs=" + (panel.fried_eggsImage != null));
+            System.out.println("honey=" + (panel.honeyImage != null));
+            System.out.println("pineapple=" + (panel.pineappleImage != null));
+            System.out.println("pretzel=" + (panel.pretzelImage != null));
+            System.out.println("pumpkin_pie=" + (panel.pumpkin_pieImage != null));
+            System.out.println("shrimp=" + (panel.shrimpImage != null));
+            System.out.println("sushi=" + (panel.sushiImage != null));
+            System.out.println("tbone=" + (panel.tboneImage != null));
+            System.out.println("watermelon=" + (panel.watermelonImage != null));
+            System.out.println("man_idle=" + (panel.man_idleImage != null));
           
         });
         // Repaint happens after image load in the EDT
