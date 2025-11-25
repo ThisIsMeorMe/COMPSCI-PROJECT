@@ -94,6 +94,8 @@ public class Main extends JPanel implements MouseMotionListener
   private int lastScaledW = -1;
   private int lastScaledH = -1;
   private Imagesfood store;
+  private BufferedImage shoppingcartImage = null;
+  private Imagesfood shoppingcart;
   private BufferedImage cursorImage = null;
   private Imagesfood cursor;
   // Virtual design resolution the UI is laid out in
@@ -124,16 +126,51 @@ public class Main extends JPanel implements MouseMotionListener
       // Draw store background to fill the virtual design area (0,0)-(VIRTUAL_WIDTH,VIRTUAL_HEIGHT)
       drawVirtualImage(g, storeImageOriginal, 0, 0, VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
     }
+    
+    // Calculate the tan box width based on the longest food label text
+    Graphics2D g2Measure = (Graphics2D) g;
+    Font originalFont = g2Measure.getFont();
+    Font bigFont = originalFont.deriveFont(originalFont.getSize2D() * 2f);
+    g2Measure.setFont(bigFont);
+    FontMetrics fm = g2Measure.getFontMetrics();
+    g2Measure.setFont(originalFont); // restore original font
+    
+    String[] foodNames = {"Apple", "Apple Pie", "Avocado", "Boar Head", "Bread", "Cheese", 
+                          "Cheesecake", "Chicken", "Cookie", "Dragon Fruit", "Fish", "Fried Eggs",
+                          "Honey", "Pineapple", "Pretzel", "Pumpkin Pie", "Shrimp", "Sushi", "T-Bone", "Watermelon"};
+    int maxTextWidth = 0;
+    for (String name : foodNames) {
+      int textWidth = fm.stringWidth(name);
+      maxTextWidth = Math.max(maxTextWidth, textWidth);
+    }
+    
+    // Convert pixel width back to virtual coordinates (divide by scale)
+    int maxTextWidthVirtual = (int) Math.round(maxTextWidth / scale);
+    
+    // Text starts at: rightX (220) + V_IMG_W (50) + 8 = 278
+    // Box should extend past the text: 278 + maxTextWidthVirtual + padding
+    int tanBoxWidth = 220 + 50 + 8 + maxTextWidthVirtual -20; // rightmost column + small padding
+    
+    // Draw tan background behind foods (width extends based on longest text)
+    g.setColor(new Color(210, 180, 140)); // Tan color
+    drawVirtualRectangle(g, 30, 70, tanBoxWidth, 620);
+    
+    // Draw black border around tan box
+    g.setColor(Color.BLACK);
+    drawVirtualBorder(g, 30, 70, tanBoxWidth, 620, 4); // 4px border thickness
+    
+    // Draw "Inventory" title at top center of box (below border)
+    drawVirtualTitleString(g, "Inventory", 30 + tanBoxWidth / 2, 120);
         
     // Layout constants for the item list
     final int V_IMG_W = 50;
     final int V_IMG_H = 50;
     // moved 25px right and 15px down from original values (small extra nudge to the right)
     final int leftX = 35;
-    final int rightX = 175;
-    final int startY = 25;
-    // slightly increased vertical spacing for a bit more room
-    final int rowSpacing = 78;
+    final int rightX = 220;
+    final int startY = 135;
+    // decreased vertical spacing to squish items closer together
+    final int rowSpacing = 55;
 
     if (appleImage != null)
     {
@@ -141,7 +178,7 @@ public class Main extends JPanel implements MouseMotionListener
       int imgX = leftX;
       int imgY = startY + row * rowSpacing;
       drawVirtualImage(g, appleImage, imgX, imgY, V_IMG_W, V_IMG_H);
-      drawVirtualString(g, "Apple", imgX + V_IMG_W + 8, imgY + 35);
+      drawVirtualString(g, "Apple", imgX + V_IMG_W + 8, imgY + 30);
     }
     if (apple_pieImage != null)
     {
@@ -314,6 +351,12 @@ public class Main extends JPanel implements MouseMotionListener
       drawVirtualImage(g, man_idleImage, imgX, imgY, man_idleImage.getWidth(), man_idleImage.getHeight());
     }
 
+    // Draw shopping cart image on top (layered above foods)
+    if (shoppingcartImage != null)
+    {
+      drawVirtualImage(g, shoppingcartImage, 50, 20, 200, 40);
+    }
+
     // No custom cursor image — let the system cursor be used.
     // (Cursor-follow image removed.)
   }
@@ -334,6 +377,21 @@ public class Main extends JPanel implements MouseMotionListener
     g.drawImage(img, ax, ay, aw, ah, this);
   }
 
+  // Helper: draw a rectangle at virtual coordinates
+  private void drawVirtualRectangle(Graphics g, int vx, int vy, int vWidth, int vHeight)
+  {
+    int panelW = getWidth();
+    int panelH = getHeight();
+    double scale = Math.min((double) panelW / VIRTUAL_WIDTH, (double) panelH / VIRTUAL_HEIGHT);
+    int offsetX = (int) Math.round((panelW - VIRTUAL_WIDTH * scale) / 2.0);
+    int offsetY = (int) Math.round((panelH - VIRTUAL_HEIGHT * scale) / 2.0);
+    int ax = offsetX + (int) Math.round(vx * scale);
+    int ay = offsetY + (int) Math.round(vy * scale);
+    int aw = Math.max(1, (int) Math.round(vWidth * scale));
+    int ah = Math.max(1, (int) Math.round(vHeight * scale));
+    g.fillRect(ax, ay, aw, ah);
+  }
+
   // Helper: draw text anchored at virtual coordinates
   private void drawVirtualString(Graphics g, String text, int vx, int vy)
   {
@@ -351,6 +409,49 @@ public class Main extends JPanel implements MouseMotionListener
     Font bigFont = oldFont.deriveFont(oldFont.getSize2D() * 2f);
     g2.setFont(bigFont);
     g2.setColor(Color.BLACK);
+    g2.drawString(text, ax, ay);
+    // restore original font and color
+    g2.setFont(oldFont);
+    g2.setColor(oldColor);
+  }
+
+  // Helper: draw a border at virtual coordinates
+  private void drawVirtualBorder(Graphics g, int vx, int vy, int vWidth, int vHeight, int borderThickness)
+  {
+    int panelW = getWidth();
+    int panelH = getHeight();
+    double scale = Math.min((double) panelW / VIRTUAL_WIDTH, (double) panelH / VIRTUAL_HEIGHT);
+    int offsetX = (int) Math.round((panelW - VIRTUAL_WIDTH * scale) / 2.0);
+    int offsetY = (int) Math.round((panelH - VIRTUAL_HEIGHT * scale) / 2.0);
+    int ax = offsetX + (int) Math.round(vx * scale);
+    int ay = offsetY + (int) Math.round(vy * scale);
+    int aw = Math.max(1, (int) Math.round(vWidth * scale));
+    int ah = Math.max(1, (int) Math.round(vHeight * scale));
+    int bt = Math.max(1, (int) Math.round(borderThickness * scale));
+    Graphics2D g2 = (Graphics2D) g;
+    g2.setStroke(new java.awt.BasicStroke(bt));
+    g2.drawRect(ax, ay, aw, ah);
+  }
+
+  // Helper: draw title text centered and bold at virtual coordinates
+  private void drawVirtualTitleString(Graphics g, String text, int vxCenter, int vy)
+  {
+    int panelW = getWidth();
+    int panelH = getHeight();
+    double scale = Math.min((double) panelW / VIRTUAL_WIDTH, (double) panelH / VIRTUAL_HEIGHT);
+    int offsetX = (int) Math.round((panelW - VIRTUAL_WIDTH * scale) / 2.0);
+    int offsetY = (int) Math.round((panelH - VIRTUAL_HEIGHT * scale) / 2.0);
+    int ay = offsetY + (int) Math.round(vy * scale);
+    Graphics2D g2 = (Graphics2D) g;
+    Font oldFont = g2.getFont();
+    Color oldColor = g2.getColor();
+    // Make the font bold and larger
+    Font boldFont = oldFont.deriveFont(java.awt.Font.BOLD, oldFont.getSize2D() * 2.5f);
+    g2.setFont(boldFont);
+    g2.setColor(Color.BLACK);
+    FontMetrics fm = g2.getFontMetrics();
+    int textWidth = fm.stringWidth(text);
+    int ax = offsetX + (int) Math.round(vxCenter * scale) - textWidth / 2;
     g2.drawString(text, ax, ay);
     // restore original font and color
     g2.setFont(oldFont);
@@ -425,6 +526,9 @@ public class Main extends JPanel implements MouseMotionListener
             panel.watermelonImage = panel.watermelon.getImage();
             // Load image from assets (synchronously) and repaint.
             
+            panel.shoppingcart = new Imagesfood("shoppingcart");
+            panel.shoppingcartImage = panel.shoppingcart.getImage();
+            
             panel.man_idle = new Imagesfood("man_idle");
             panel.man_idleImage = panel.man_idle.getImage();
 
@@ -460,5 +564,3 @@ public class Main extends JPanel implements MouseMotionListener
 
     } 
 }
-
-
