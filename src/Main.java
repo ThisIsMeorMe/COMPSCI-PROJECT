@@ -3,6 +3,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import javax.swing.*;
+import javax.swing.Timer;
 
 
 public class Main extends JPanel implements MouseMotionListener
@@ -10,9 +11,14 @@ public class Main extends JPanel implements MouseMotionListener
   // The variables store coordiates 
   private int mouseX = -10;
   private int mouseY = -10;
+  private Timer refreshTimer;
+  
   public Main()
   {
     addMouseMotionListener(this);
+    // Refresh panel 60 times per second for smooth cursor tracking
+    refreshTimer = new Timer(16, e -> repaint());
+    refreshTimer.start();
   }
 
   @Override
@@ -21,6 +27,8 @@ public class Main extends JPanel implements MouseMotionListener
   {
     mouseX = e.getX();
     mouseY = e.getY();
+    // update the panel immediately so cursor image follows smoothly
+    repaint();
   }
 
   @Override
@@ -86,30 +94,28 @@ public class Main extends JPanel implements MouseMotionListener
   private int lastScaledW = -1;
   private int lastScaledH = -1;
   private Imagesfood store;
+  private BufferedImage cursorImage = null;
+  private Imagesfood cursor;
   // Virtual design resolution the UI is laid out in
   private static final int VIRTUAL_WIDTH = 1535;
   private static final int VIRTUAL_HEIGHT = 830;
-
-
 
   @Override
   public void paintComponent(Graphics g)
   {
     super.paintComponent(g);
     // Creates a red background
-    g.setColor(Color.RED);
-    g.fillRect(0, 0, getWidth(), getHeight());
-
-    // Creates a black circle at mouse position
     g.setColor(Color.BLACK);
-    g.fillOval(mouseX - 15, mouseY - 15, 30, 30);
+    g.fillRect(0, 0, getWidth(), getHeight());
 
     // Precompute virtual -> actual scale and offsets so all drawings
     // keep locked positions relative to a 1535x830 design resolution.
     int panelW = getWidth();
     int panelH = getHeight();
     double scale = Math.min((double) panelW / VIRTUAL_WIDTH, (double) panelH / VIRTUAL_HEIGHT);
+    @SuppressWarnings("unused")
     int offsetX = (int) Math.round((panelW - VIRTUAL_WIDTH * scale) / 2.0);
+    @SuppressWarnings("unused")
     int offsetY = (int) Math.round((panelH - VIRTUAL_HEIGHT * scale) / 2.0);
 
     // Renders all the images
@@ -307,6 +313,22 @@ public class Main extends JPanel implements MouseMotionListener
       // draw at its own image size but scaled to virtual coords
       drawVirtualImage(g, man_idleImage, imgX, imgY, man_idleImage.getWidth(), man_idleImage.getHeight());
     }
+
+    // Draw cursor image at mouse position LAST (on top of everything)
+    // Scale cursor to 1/8 of its original size
+    if (cursorImage != null)
+    {
+      int cW = Math.max(1, (int) Math.round(cursorImage.getWidth() * scale / 8.0));
+      int cH = Math.max(1, (int) Math.round(cursorImage.getHeight() * scale / 8.0));
+      int cx = mouseX - cW/2;
+      int cy = mouseY - cH/2;
+      g.drawImage(cursorImage, cx, cy, cW, cH, this);
+    }
+    else
+    {
+      g.setColor(Color.BLACK);
+      g.fillOval(mouseX - 7, mouseY - 7, 15, 15);
+    }
   }
 
   // Helper: draw a buffered image positioned/sized in virtual coordinates
@@ -337,12 +359,15 @@ public class Main extends JPanel implements MouseMotionListener
     int ay = offsetY + (int) Math.round(vy * scale);
     Graphics2D g2 = (Graphics2D) g;
     Font oldFont = g2.getFont();
+    Color oldColor = g2.getColor();
     // Make the font double size for these labels
     Font bigFont = oldFont.deriveFont(oldFont.getSize2D() * 2f);
     g2.setFont(bigFont);
+    g2.setColor(Color.BLACK);
     g2.drawString(text, ax, ay);
-    // restore original font
+    // restore original font and color
     g2.setFont(oldFont);
+    g2.setColor(oldColor);
   }
 
     private BufferedImage getScaledImage(BufferedImage src, int targetW, int targetH) {
@@ -415,6 +440,9 @@ public class Main extends JPanel implements MouseMotionListener
             
             panel.man_idle = new Imagesfood("man_idle");
             panel.man_idleImage = panel.man_idle.getImage();
+
+            panel.cursor = new Imagesfood("cursor");
+            panel.cursorImage = panel.cursor.getImage();
 
             // Debug: print which images loaded successfully
             System.out.println("Image load status:");
