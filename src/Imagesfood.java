@@ -17,28 +17,49 @@ public class Imagesfood {
     public Imagesfood(String imagename) {
         this.name = imagename;
         try {
-            // Try multiple possible paths for assets/images
-            String[] possiblePaths = {
-                "assets/images/" + imagename + ".png",
-                "../assets/images/" + imagename + ".png",
-                "../../assets/images/" + imagename + ".png",
-                System.getProperty("user.dir") + "/assets/images/" + imagename + ".png",
-                System.getProperty("user.dir") + "/COMPSCI-PROJECT-main677777/assets/images/" + imagename + ".png"
-            };
-            
+            // First try loading from the classpath (works when assets are bundled)
+            String resourcePath = "/assets/images/" + imagename + ".png";
+            try {
+                java.io.InputStream is = Imagesfood.class.getResourceAsStream(resourcePath);
+                if (is != null) {
+                    this.image = ImageIO.read(is);
+                    is.close();
+                    return;
+                }
+            } catch (Exception e) {
+                // continue to filesystem search on any failure
+            }
+
+            // Next, search filesystem starting from user.dir and walking up a few levels
             File imageFile = null;
-            for (String path : possiblePaths) {
-                File f = new File(path);
-                if (f.exists()) {
-                    imageFile = f;
+            File cwd = new File(System.getProperty("user.dir"));
+            for (int up = 0; up < 5 && cwd != null; up++) {
+                File candidate = new File(cwd, "assets/images/" + imagename + ".png");
+                if (candidate.exists()) {
+                    imageFile = candidate;
                     break;
                 }
+                cwd = cwd.getParentFile();
             }
-            
+
+            // If not found yet, do a limited recursive search under user.dir (depth-limited)
+            if (imageFile == null) {
+                try {
+                    java.nio.file.Path start = new java.io.File(System.getProperty("user.dir")).toPath();
+                    final String targetName = imagename + ".png";
+                    java.util.Optional<java.nio.file.Path> found = java.nio.file.Files.walk(start, 4)
+                        .filter(p -> p.getFileName().toString().equalsIgnoreCase(targetName))
+                        .findFirst();
+                    if (found.isPresent()) imageFile = found.get().toFile();
+                } catch (Exception ex) {
+                    // ignore and fallthrough to not-found handling
+                }
+            }
+
             if (imageFile != null) {
                 this.image = ImageIO.read(imageFile);
             } else {
-                System.err.println("Failed to find image for: " + imagename + " in any of the expected locations");
+                System.err.println("Failed to find image for: " + imagename + " (tried classpath and filesystem)");
                 this.image = null;
             }
         } catch (IOException ex) {
