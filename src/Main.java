@@ -6,16 +6,24 @@ import javax.swing.*;
 import javax.swing.Timer;
 
 
-public class Main extends JPanel implements MouseMotionListener
+public class Main extends JPanel implements MouseMotionListener, MouseListener
 {
   // The variables store coordiates 
   private int mouseX = -10;
   private int mouseY = -10;
   private Timer refreshTimer;
+  // Controls whether the inventory (tan box, outline, food images and text)
+  // are visible. Starts hidden (false).
+  private boolean showInventory = false;
+  // Global UI shift (virtual coordinates). Change these to move the
+  // shopping cart, background, outline, and food list by the same amount.
+  private int uiShiftX = 70;
+  private int uiShiftY = 50;
   
   public Main()
   {
     addMouseMotionListener(this);
+    addMouseListener(this);
     // Refresh panel 60 times per second for smooth cursor tracking
     refreshTimer = new Timer(16, e -> repaint());
     refreshTimer.start();
@@ -36,6 +44,37 @@ public class Main extends JPanel implements MouseMotionListener
   {
     
   }
+
+  @Override
+  public void mouseClicked(MouseEvent e) { }
+
+  @Override
+  public void mousePressed(MouseEvent e)
+  {
+    // Convert actual panel coords to virtual coords so hit test matches drawn cart
+    int panelW = getWidth();
+    int panelH = getHeight();
+    double scale = Math.min((double) panelW / VIRTUAL_WIDTH, (double) panelH / VIRTUAL_HEIGHT);
+    int offsetX = (int) Math.round((panelW - VIRTUAL_WIDTH * scale) / 2.0);
+    int offsetY = (int) Math.round((panelH - VIRTUAL_HEIGHT * scale) / 2.0);
+    int vx = (int) Math.round((e.getX() - offsetX) / scale);
+    int vy = (int) Math.round((e.getY() - offsetY) / scale);
+
+    // Shopping cart is drawn at base (50,70) shifted by uiShiftX/uiShiftY — toggle when clicked
+    if (vx >= 50 + uiShiftX && vx <= 50 + uiShiftX + 60 && vy >= 70 + uiShiftY && vy <= 70 + uiShiftY + 60) {
+      showInventory = !showInventory;
+      repaint();
+    }
+  }
+
+  @Override
+  public void mouseReleased(MouseEvent e) { }
+
+  @Override
+  public void mouseEntered(MouseEvent e) { }
+
+  @Override
+  public void mouseExited(MouseEvent e) { }
     
   public int getMouseX()
   {
@@ -123,10 +162,11 @@ public class Main extends JPanel implements MouseMotionListener
     // Renders all the images
     if (storeImageOriginal != null)
     {
-      // Draw store background to fill the virtual design area (0,0)-(VIRTUAL_WIDTH,VIRTUAL_HEIGHT)
+      // Draw store background at fixed position (not affected by uiShift)
       drawVirtualImage(g, storeImageOriginal, 0, 0, VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
     }
     
+    if (showInventory) {
     // Calculate the tan box width based on the longest food label text
     Graphics2D g2Measure = (Graphics2D) g;
     Font originalFont = g2Measure.getFont();
@@ -147,28 +187,30 @@ public class Main extends JPanel implements MouseMotionListener
     // Convert pixel width back to virtual coordinates (divide by scale)
     int maxTextWidthVirtual = (int) Math.round(maxTextWidth / scale);
     
-    // Text starts at: rightX (220) + V_IMG_W (50) + 8 = 278
-    // Box should extend past the text: 278 + maxTextWidthVirtual + padding
-    int tanBoxWidth = 220 + 50 + 8 + maxTextWidthVirtual -20; // rightmost column + small padding
+    // Text starts at: rightX (290) + V_IMG_W (50) + 8 = 348
+    // Box should extend past the text: 348 + maxTextWidthVirtual + padding
+    int tanBoxWidth = 290 + 50 + 8 + maxTextWidthVirtual -20; // rightmost column + small padding
     
     // Draw tan background behind foods (width extends based on longest text)
     g.setColor(new Color(210, 180, 140)); // Tan color
-    drawVirtualRectangle(g, 30, 70, tanBoxWidth, 620);
+    // Draw box at base (30,70) shifted by uiShiftX/uiShiftY
+    drawVirtualRectangle(g, 30 + uiShiftX, 70 + uiShiftY, tanBoxWidth, 620);
     
     // Draw black border around tan box
     g.setColor(Color.BLACK);
-    drawVirtualBorder(g, 30, 70, tanBoxWidth, 620, 4); // 4px border thickness
+    drawVirtualBorder(g, 30 + uiShiftX, 70 + uiShiftY, tanBoxWidth, 620, 4); // 4px border thickness
     
     // Draw "Inventory" title at top center of box (below border)
-    drawVirtualTitleString(g, "Inventory", 30 + tanBoxWidth / 2, 120);
+    drawVirtualTitleString(g, "Inventory", 30 + uiShiftX + tanBoxWidth / 2, 120 + uiShiftY);
         
     // Layout constants for the item list
     final int V_IMG_W = 50;
     final int V_IMG_H = 50;
     // moved 25px right and 15px down from original values (small extra nudge to the right)
-    final int leftX = 35;
-    final int rightX = 220;
-    final int startY = 135;
+    // then shifted overall UI by uiShiftX/uiShiftY
+    final int leftX = 35 + uiShiftX;
+    final int rightX = 220 + uiShiftX;
+    final int startY = 135 + uiShiftY;
     // decreased vertical spacing to squish items closer together
     final int rowSpacing = 55;
 
@@ -342,11 +384,12 @@ public class Main extends JPanel implements MouseMotionListener
       drawVirtualImage(g, watermelonImage, imgX, imgY, V_IMG_W, V_IMG_H);
       drawVirtualString(g, "Watermelon", imgX + V_IMG_W + 8, imgY + 35);
     }
+    }
 
     if (man_idleImage != null)
     {
-      int imgX = 1300;
-      int imgY = 520;
+      int imgX = 1300; // fixed position — not affected by uiShift
+      int imgY = 520;  // fixed position — not affected by uiShift
       // draw at its own image size but scaled to virtual coords
       drawVirtualImage(g, man_idleImage, imgX, imgY, man_idleImage.getWidth(), man_idleImage.getHeight());
     }
@@ -354,7 +397,8 @@ public class Main extends JPanel implements MouseMotionListener
     // Draw shopping cart image on top (layered above foods)
     if (shoppingcartImage != null)
     {
-      drawVirtualImage(g, shoppingcartImage, 50, 20, 200, 40);
+      // draw shopping cart at base (50,70) shifted by uiShiftX/uiShiftY
+      drawVirtualImage(g, shoppingcartImage, 50 + uiShiftX, 70 + uiShiftY, 60, 60);
     }
 
     // No custom cursor image — let the system cursor be used.
