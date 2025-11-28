@@ -3,7 +3,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import javax.swing.*;
-import javax.swing.Timer;
 
 
 public class Main extends JPanel implements MouseMotionListener, MouseListener
@@ -137,6 +136,8 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
   private Imagesfood shoppingcart;
   private BufferedImage cursorImage = null;
   private Imagesfood cursor;
+  private BufferedImage customer2Image = null;
+  private Imagesfood customer2;
   // Virtual design resolution the UI is laid out in
   private static final int VIRTUAL_WIDTH = 1535;
   private static final int VIRTUAL_HEIGHT = 830;
@@ -400,6 +401,11 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       // draw shopping cart at base (50,70) shifted by uiShiftX/uiShiftY
       drawVirtualImage(g, shoppingcartImage, 50 + uiShiftX, 70 + uiShiftY, 60, 60);
     }
+    if (customer2Image != null)
+    {
+      // draw shopping cart at base (50,70) shifted by uiShiftX/uiShiftY
+      drawVirtualImage(g, customer2Image, 750 + uiShiftX, 400 + uiShiftY, 250, 250);
+    }
 
     // No custom cursor image — let the system cursor be used.
     // (Cursor-follow image removed.)
@@ -603,8 +609,20 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
             System.out.println("watermelon=" + (panel.watermelonImage != null));
             System.out.println("man_idle=" + (panel.man_idleImage != null));
           
+            // Load customer2 image after 10 seconds
+            Timer delayedImageTimer = new Timer(10000, e -> {
+                panel.customer2 = new Imagesfood("customer2_idle/1");
+                panel.customer2Image = panel.customer2.getImage();
+                System.out.println("Delayed customer2 image loaded: " + (panel.customer2Image != null));
+                panel.repaint();
+            });
+            delayedImageTimer.setRepeats(false);
+            delayedImageTimer.start();
         });
         // Repaint happens after image load in the EDT
 
-    } 
+        
+
+    }
+    
 }
