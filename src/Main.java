@@ -140,6 +140,10 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
   private Imagesfood customer2;
   private BufferedImage cloudImage = null;
   private Imagesfood cloud;
+  // apple image that appears inside the cloud (separate from inventory apple)
+  private BufferedImage cloudAppleImage = null;
+  private Imagesfood cloudApple;
+  private boolean showCloudApple = false;
   // Virtual design resolution the UI is laid out in
   private static final int VIRTUAL_WIDTH = 1535;
   private static final int VIRTUAL_HEIGHT = 830;
@@ -413,6 +417,11 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       // draw shopping cart at base (50,70) shifted by uiShiftX/uiShiftY
       drawVirtualImage(g, cloudImage, 900 + uiShiftX, 450 + uiShiftY, 100, 100);
     }
+    if (cloudAppleImage != null)
+    {
+      // draw the apple inside the cloud at the same position/size
+      drawVirtualImage(g, cloudAppleImage, 933 + uiShiftX, 490 + uiShiftY, 30, 30);
+    }
 
     // No custom cursor image — let the system cursor be used.
     // (Cursor-follow image removed.)
@@ -624,6 +633,11 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
                 panel.cloud = new Imagesfood("cloud");
                 panel.cloudImage = panel.cloud.getImage(); 
                 System.out.println("Delayed cloud image loaded: " + (panel.cloudImage != null));
+              // load an apple to appear inside the cloud
+              panel.cloudApple = new Imagesfood("apple");
+              panel.cloudAppleImage = panel.cloudApple.getImage(); 
+              panel.showCloudApple = (panel.cloudAppleImage != null);
+              System.out.println("Delayed cloud-apple image loaded: " + (panel.cloudAppleImage != null));
                 panel.repaint();
             });
             delayedImageTimer.setRepeats(false);
