@@ -41,7 +41,18 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
   @Override
   public void mouseDragged(MouseEvent e)
   {
-    
+    if (currentDrag == null) return;
+    // update current drag position using virtual coordinates
+    int panelW = getWidth();
+    int panelH = getHeight();
+    double scale = Math.min((double) panelW / VIRTUAL_WIDTH, (double) panelH / VIRTUAL_HEIGHT);
+    int offsetX = (int) Math.round((panelW - VIRTUAL_WIDTH * scale) / 2.0);
+    int offsetY = (int) Math.round((panelH - VIRTUAL_HEIGHT * scale) / 2.0);
+    int vx = (int) Math.round((e.getX() - offsetX) / scale);
+    int vy = (int) Math.round((e.getY() - offsetY) / scale);
+    currentDrag.vx = vx - currentDrag.offsetX;
+    currentDrag.vy = vy - currentDrag.offsetY;
+    repaint();
   }
 
   @Override
@@ -63,6 +74,66 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
     if (vx >= 50 + uiShiftX && vx <= 50 + uiShiftX + 60 && vy >= 70 + uiShiftY && vy <= 70 + uiShiftY + 60) {
       showInventory = !showInventory;
       repaint();
+      return;
+    }
+
+    // If inventory is visible, check whether user clicked on any inventory food to create a draggable copy
+    if (showInventory) {
+      final int V_IMG_W = 50;
+      final int V_IMG_H = 50;
+      final int leftX = 35 + uiShiftX;
+      final int rightX = 220 + uiShiftX;
+      final int startY = 135 + uiShiftY;
+      final int rowSpacing = 55;
+
+      // helper to check a single item at (col,row) and start drag copy if hit
+      java.util.function.BiFunction<java.awt.image.BufferedImage, java.awt.Point, Boolean> tryStart = (img, pt) -> {
+        if (img == null) return false;
+        int imgX = pt.x;
+        int imgY = pt.y;
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+          DragItem di = new DragItem(img, imgX, imgY, V_IMG_W, V_IMG_H);
+          di.offsetX = vx - imgX;
+          di.offsetY = vy - imgY;
+          activeDrags.add(di);
+          currentDrag = di;
+          repaint();
+          return true;
+        }
+        return false;
+      };
+
+      // check items in same order as drawn (two columns)
+      // row 0
+      if (tryStart.apply(appleImage, new Point(leftX, startY + 0*rowSpacing))) return;
+      if (tryStart.apply(apple_pieImage, new Point(rightX, startY + 0*rowSpacing))) return;
+      // row1
+      if (tryStart.apply(avocadoImage, new Point(leftX, startY + 1*rowSpacing))) return;
+      if (tryStart.apply(boar_headImage, new Point(rightX, startY + 1*rowSpacing))) return;
+      // row2
+      if (tryStart.apply(breadImage, new Point(leftX, startY + 2*rowSpacing))) return;
+      if (tryStart.apply(cheeseImage, new Point(rightX, startY + 2*rowSpacing))) return;
+      // row3
+      if (tryStart.apply(cheesecakeImage, new Point(leftX, startY + 3*rowSpacing))) return;
+      if (tryStart.apply(chickenImage, new Point(rightX, startY + 3*rowSpacing))) return;
+      // row4
+      if (tryStart.apply(cookieImage, new Point(leftX, startY + 4*rowSpacing))) return;
+      if (tryStart.apply(dragon_fruitImage, new Point(rightX, startY + 4*rowSpacing))) return;
+      // row5
+      if (tryStart.apply(fishImage, new Point(leftX, startY + 5*rowSpacing))) return;
+      if (tryStart.apply(fried_eggsImage, new Point(rightX, startY + 5*rowSpacing))) return;
+      // row6
+      if (tryStart.apply(honeyImage, new Point(leftX, startY + 6*rowSpacing))) return;
+      if (tryStart.apply(pineappleImage, new Point(rightX, startY + 6*rowSpacing))) return;
+      // row7
+      if (tryStart.apply(pretzelImage, new Point(leftX, startY + 7*rowSpacing))) return;
+      if (tryStart.apply(pumpkin_pieImage, new Point(rightX, startY + 7*rowSpacing))) return;
+      // row8
+      if (tryStart.apply(shrimpImage, new Point(leftX, startY + 8*rowSpacing))) return;
+      if (tryStart.apply(sushiImage, new Point(rightX, startY + 8*rowSpacing))) return;
+      // row9
+      if (tryStart.apply(tboneImage, new Point(leftX, startY + 9*rowSpacing))) return;
+      if (tryStart.apply(watermelonImage, new Point(rightX, startY + 9*rowSpacing))) return;
     }
   }
 
@@ -144,6 +215,17 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
   private BufferedImage cloudAppleImage = null;
   private Imagesfood cloudApple;
   private boolean showCloudApple = false;
+  // Drag copies created when user clicks inventory items. Originals remain.
+  private static class DragItem {
+    BufferedImage img;
+    int vx, vy, vW, vH;
+    int offsetX, offsetY;
+    DragItem(BufferedImage img, int vx, int vy, int vW, int vH) {
+      this.img = img; this.vx = vx; this.vy = vy; this.vW = vW; this.vH = vH; this.offsetX = 0; this.offsetY = 0;
+    }
+  }
+  private final java.util.List<DragItem> activeDrags = new java.util.ArrayList<>();
+  private DragItem currentDrag = null;
   // Virtual design resolution the UI is laid out in
   private static final int VIRTUAL_WIDTH = 1535;
   private static final int VIRTUAL_HEIGHT = 830;
@@ -423,6 +505,13 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       drawVirtualImage(g, cloudAppleImage, 933 + uiShiftX, 490 + uiShiftY, 30, 30);
     }
 
+    // draw active drag copies on top
+    if (!activeDrags.isEmpty()) {
+      for (DragItem d : activeDrags) {
+        if (d != null && d.img != null) drawVirtualImage(g, d.img, d.vx, d.vy, d.vW, d.vH);
+      }
+    }
+
     // No custom cursor image — let the system cursor be used.
     // (Cursor-follow image removed.)
   }
@@ -642,6 +731,21 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
             });
             delayedImageTimer.setRepeats(false);
             delayedImageTimer.start();
+
+            // --- Add a draggable apple component to the layered pane ---
+            // Create an Imagesfood for the apple and a draggable component
+            // Imagesfood draggableApple = new Imagesfood("apple");
+            // javax.swing.JComponent appleComp = draggableApple.createDraggableComponent(900 + panel.uiShiftX, 450 + panel.uiShiftY);
+            // // Add to the frame's layered pane so it uses absolute positioning and can be dragged
+            // frame.getLayeredPane().add(appleComp, javax.swing.JLayeredPane.DRAG_LAYER);
+            // Imagesfood draggableApple_Pie = new Imagesfood("apple_pie");
+            // javax.swing.JComponent apple_pieComp = draggableApple_Pie.createDraggableComponent(900 + panel.uiShiftX, 450 + panel.uiShiftY);
+            // // Add to the frame's layered pane so it uses absolute positioning and can be dragged
+            // frame.getLayeredPane().add(apple_pieComp, javax.swing.JLayeredPane.DRAG_LAYER);
+            // Imagesfood draggableAvacado = new Imagesfood("avacado");
+            // javax.swing.JComponent avacadoComp = draggableAvacado.createDraggableComponent(900 + panel.uiShiftX, 450 + panel.uiShiftY);
+            // // Add to the frame's layered pane so it uses absolute positioning and can be dragged
+            // frame.getLayeredPane().add(avacadoComp, javax.swing.JLayeredPane.DRAG_LAYER);
         });
         // Repaint happens after image load in the EDT
 
