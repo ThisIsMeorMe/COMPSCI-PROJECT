@@ -2,6 +2,9 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
 
 /**
  * Simple container for named food images.
@@ -80,6 +83,78 @@ public class Imagesfood {
 
     public BufferedImage getImage() {
         return image;
+    }
+
+    /**
+     * Create a Swing component that displays this image and supports
+     * simple mouse dragging. The returned component uses absolute
+     * positioning (its bounds are set to [startX,startY,width,height])
+     * so you should add it to a container that supports absolute layout
+     * (for example a `JLayeredPane` or a container with `null` layout).
+     *
+     * Example:
+     *   JComponent c = img.createDraggableComponent(100, 200);
+     *   layeredPane.add(c, JLayeredPane.DRAG_LAYER);
+     *
+     * @param startX virtual x (pixels) where component will be placed
+     * @param startY virtual y (pixels) where component will be placed
+     * @return a JComponent you can add to your Swing hierarchy
+     */
+    public JComponent createDraggableComponent(int startX, int startY) {
+        if (image == null) {
+            JPanel empty = new JPanel();
+            empty.setOpaque(false);
+            empty.setBounds(startX, startY, 0, 0);
+            return empty;
+        }
+        DraggableComponent comp = new DraggableComponent(image);
+        comp.setBounds(startX, startY, image.getWidth(), image.getHeight());
+        return comp;
+    }
+
+    // Simple inner component that paints the BufferedImage and allows dragging
+    private static class DraggableComponent extends JComponent implements MouseListener, MouseMotionListener {
+        private final BufferedImage img;
+        private int pressX, pressY;
+
+        DraggableComponent(BufferedImage img) {
+            this.img = img;
+            setSize(img.getWidth(), img.getHeight());
+            addMouseListener(this);
+            addMouseMotionListener(this);
+            setOpaque(false);
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            g.drawImage(img, 0, 0, getWidth(), getHeight(), this);
+        }
+
+        @Override
+        public void mousePressed(MouseEvent e) {
+            pressX = e.getX();
+            pressY = e.getY();
+        }
+
+        @Override
+        public void mouseDragged(MouseEvent e) {
+            Container p = getParent();
+            if (p == null) return;
+            int newX = getX() + e.getX() - pressX;
+            int newY = getY() + e.getY() - pressY;
+            // keep inside parent bounds
+            newX = Math.max(0, Math.min(newX, Math.max(0, p.getWidth() - getWidth())));
+            newY = Math.max(0, Math.min(newY, Math.max(0, p.getHeight() - getHeight())));
+            setLocation(newX, newY);
+            p.repaint();
+        }
+
+        @Override public void mouseReleased(MouseEvent e) { }
+        @Override public void mouseClicked(MouseEvent e) { }
+        @Override public void mouseEntered(MouseEvent e) { }
+        @Override public void mouseExited(MouseEvent e) { }
+        @Override public void mouseMoved(MouseEvent e) { }
     }
 
     @Override
