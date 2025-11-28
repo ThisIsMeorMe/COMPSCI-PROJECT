@@ -138,6 +138,8 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
   private Imagesfood cursor;
   private BufferedImage customer2Image = null;
   private Imagesfood customer2;
+  private BufferedImage cloudImage = null;
+  private Imagesfood cloud;
   // Virtual design resolution the UI is laid out in
   private static final int VIRTUAL_WIDTH = 1535;
   private static final int VIRTUAL_HEIGHT = 830;
@@ -406,6 +408,11 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       // draw shopping cart at base (50,70) shifted by uiShiftX/uiShiftY
       drawVirtualImage(g, customer2Image, 750 + uiShiftX, 400 + uiShiftY, 250, 250);
     }
+    if (cloudImage != null)
+    {
+      // draw shopping cart at base (50,70) shifted by uiShiftX/uiShiftY
+      drawVirtualImage(g, cloudImage, 900 + uiShiftX, 450 + uiShiftY, 100, 100);
+    }
 
     // No custom cursor image — let the system cursor be used.
     // (Cursor-follow image removed.)
@@ -610,10 +617,13 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
             System.out.println("man_idle=" + (panel.man_idleImage != null));
           
             // Load customer2 image after 10 seconds
-            Timer delayedImageTimer = new Timer(10000, e -> {
+            Timer delayedImageTimer = new Timer(2000, e -> {
                 panel.customer2 = new Imagesfood("customer2_idle/1");
                 panel.customer2Image = panel.customer2.getImage();
                 System.out.println("Delayed customer2 image loaded: " + (panel.customer2Image != null));
+                panel.cloud = new Imagesfood("cloud");
+                panel.cloudImage = panel.cloud.getImage(); 
+                System.out.println("Delayed cloud image loaded: " + (panel.cloudImage != null));
                 panel.repaint();
             });
             delayedImageTimer.setRepeats(false);
