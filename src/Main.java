@@ -71,7 +71,7 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
     if (vx >= 800 && vx <= 950 && vy >= 80 && vy <= 230) {
     if (questionPanel == null) {
         questionPanel = new QuestionPanel();
-        questionPanel.setBounds(100, 200, 600, 300);
+        questionPanel.setBounds(350, 270, 800, 500);
 
         // Add to the layered pane above everything
         JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
