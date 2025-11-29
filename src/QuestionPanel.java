@@ -18,19 +18,18 @@ public class QuestionPanel extends JPanel {
 
         // Question label
         questionLabel = new JLabel();
-        questionLabel.setBounds(20, 20, 560, 40); // wide enough for the panel
-        questionLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        questionLabel.setBounds(150, 65, 560, 70); // wide enough for the panel
+        questionLabel.setFont(new Font("Arial", Font.BOLD, 65));
         this.add(questionLabel);
 
         // Answer input field
         answerField = new JTextField();
-        answerField.setBounds(50, 200, 300, 50);
+        answerField.setBounds(250, 400, 300, 50);
         this.add(answerField);
 
         // Feedback label (for "correct"/"incorrect")
         feedbackLabel = new JLabel("", SwingConstants.CENTER);
-        feedbackLabel.setBounds(70, 120, 500, 60);
-        feedbackLabel.setFont(new Font("Arial", Font.PLAIN, 60));
+        feedbackLabel.setBounds(60, 230, 700, 60);
         this.add(feedbackLabel);
 
         // Generate the first question
@@ -49,13 +48,19 @@ public class QuestionPanel extends JPanel {
         answerField.requestFocusInWindow();
     }
 
-    private void checkAnswer() {
-        try {
+    private void checkAnswer() 
+    {
+        try 
+        {
             int userAnswer = Integer.parseInt(answerField.getText().trim());
-            if (userAnswer == x + y) {
+            if (userAnswer == x + y) 
+                {
+                feedbackLabel.setFont(new Font("Arial", Font.PLAIN, 80));
                 feedbackLabel.setText("Correct!");
                 feedbackLabel.setForeground(Color.GREEN);
-            } else {
+            } 
+            else {
+                feedbackLabel.setFont(new Font("Arial", Font.PLAIN, 80));
                 feedbackLabel.setText("Incorrect!");
                 feedbackLabel.setForeground(Color.RED);
             }
@@ -67,7 +72,7 @@ public class QuestionPanel extends JPanel {
 
         } catch (NumberFormatException ex) {
             feedbackLabel.setForeground(Color.BLUE);
-            feedbackLabel.setFont(new Font("Arial", Font.PLAIN, 40));
+            feedbackLabel.setFont(new Font("Arial", Font.PLAIN, 60));
             feedbackLabel.setText("Enter a valid number!");
             // Clear after 1 second
             Timer feedbackTimer = new Timer(1000, e -> feedbackLabel.setText(""));
