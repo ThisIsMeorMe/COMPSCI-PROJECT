@@ -24,13 +24,13 @@ public class QuestionPanel extends JPanel {
 
         // Answer input field
         answerField = new JTextField();
-        answerField.setBounds(20, 250, 100, 30);
+        answerField.setBounds(50, 200, 300, 50);
         this.add(answerField);
 
         // Feedback label (for "correct"/"incorrect")
         feedbackLabel = new JLabel("", SwingConstants.CENTER);
-        feedbackLabel.setBounds(150, 250, 200, 30);
-        feedbackLabel.setFont(new Font("Arial", Font.PLAIN, 18));
+        feedbackLabel.setBounds(70, 120, 500, 60);
+        feedbackLabel.setFont(new Font("Arial", Font.PLAIN, 60));
         this.add(feedbackLabel);
 
         // Generate the first question
@@ -54,8 +54,10 @@ public class QuestionPanel extends JPanel {
             int userAnswer = Integer.parseInt(answerField.getText().trim());
             if (userAnswer == x + y) {
                 feedbackLabel.setText("Correct!");
+                feedbackLabel.setForeground(Color.GREEN);
             } else {
                 feedbackLabel.setText("Incorrect!");
+                feedbackLabel.setForeground(Color.RED);
             }
 
             // Hide feedback after 1 second and generate a new question
@@ -64,6 +66,8 @@ public class QuestionPanel extends JPanel {
             feedbackTimer.start();
 
         } catch (NumberFormatException ex) {
+            feedbackLabel.setForeground(Color.BLUE);
+            feedbackLabel.setFont(new Font("Arial", Font.PLAIN, 40));
             feedbackLabel.setText("Enter a valid number!");
             // Clear after 1 second
             Timer feedbackTimer = new Timer(1000, e -> feedbackLabel.setText(""));
