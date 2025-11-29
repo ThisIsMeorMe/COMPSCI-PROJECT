@@ -56,7 +56,30 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
   }
 
   @Override
-  public void mouseClicked(MouseEvent e) { }
+    public void mouseClicked(MouseEvent e) {
+    // Show the question panel when the question image is clicked
+    int panelW = getWidth();
+    int panelH = getHeight();
+    double scale = Math.min((double) panelW / VIRTUAL_WIDTH, (double) panelH / VIRTUAL_HEIGHT);
+    int offsetX = (int) Math.round((panelW - VIRTUAL_WIDTH * scale) / 2.0);
+    int offsetY = (int) Math.round((panelH - VIRTUAL_HEIGHT * scale) / 2.0);
+    int vx = (int) Math.round((e.getX() - offsetX) / scale);
+    int vy = (int) Math.round((e.getY() - offsetY) / scale);
+    if (vx >= 800 && vx <= 950 && vy >= 80 && vy <= 230) {
+    if (questionPanel == null) {
+        questionPanel = new QuestionPanel();
+        questionPanel.setBounds(100, 150, 600, 300);
+
+        // Add to the layered pane above everything
+        JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
+        topFrame.getLayeredPane().add(questionPanel, JLayeredPane.POPUP_LAYER);
+    }
+
+    // Toggle visibility
+    questionVisible = !questionVisible;
+    questionPanel.setVisible(questionVisible);
+    questionPanel.repaint();
+}
 
   @Override
   public void mousePressed(MouseEvent e)
