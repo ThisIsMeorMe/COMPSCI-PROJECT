@@ -18,6 +18,9 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
   // shopping cart, background, outline, and food list by the same amount.
   private int uiShiftX = 70;
   private int uiShiftY = 50;
+  // Question panel and visibility flag
+  private QuestionPanel questionPanel = null;
+  private boolean questionVisible = false;
   
   public Main()
   {
@@ -68,7 +71,7 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
     if (vx >= 800 && vx <= 950 && vy >= 80 && vy <= 230) {
     if (questionPanel == null) {
         questionPanel = new QuestionPanel();
-        questionPanel.setBounds(100, 150, 600, 300);
+        questionPanel.setBounds(100, 200, 600, 300);
 
         // Add to the layered pane above everything
         JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
@@ -79,6 +82,7 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
     questionVisible = !questionVisible;
     questionPanel.setVisible(questionVisible);
     questionPanel.repaint();
+    }
 }
 
   @Override
@@ -238,6 +242,9 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
   private BufferedImage cloudAppleImage = null;
   private Imagesfood cloudApple;
   private boolean showCloudApple = false;
+
+  private BufferedImage questionImage = null;
+  private Imagesfood question;
   // Drag copies created when user clicks inventory items. Originals remain.
   private static class DragItem {
     BufferedImage img;
@@ -528,6 +535,12 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       drawVirtualImage(g, cloudAppleImage, 933 + uiShiftX, 490 + uiShiftY, 30, 30);
     }
 
+    if (questionImage != null)
+    {
+      // draw question image at fixed position (not affected by uiShift)
+      drawVirtualImage(g, questionImage, 800, 80, 150, 150);
+    }
+
     // draw active drag copies on top
     if (!activeDrags.isEmpty()) {
       for (DragItem d : activeDrags) {
@@ -709,6 +722,9 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
             
             panel.man_idle = new Imagesfood("man_idle");
             panel.man_idleImage = panel.man_idle.getImage();
+
+            panel.question = new Imagesfood("question");
+            panel.questionImage = panel.question.getImage();
 
             // cursor image removed - use system cursor instead
 
