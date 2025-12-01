@@ -57,7 +57,7 @@ public class QuestionPanel extends JPanel {
                 {
                 feedbackLabel.setFont(new Font("Arial", Font.PLAIN, 80));
                 feedbackLabel.setText("Correct!");
-                feedbackLabel.setForeground(Color.GREEN);
+                feedbackLabel.setForeground(new Color(0,100,0)); // darker green (#006400)
             } 
             else {
                 feedbackLabel.setFont(new Font("Arial", Font.PLAIN, 80));
