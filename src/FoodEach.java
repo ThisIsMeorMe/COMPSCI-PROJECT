@@ -1,14 +1,21 @@
+import java.util.ArrayList;
+import java.util.List;
+
 public class FoodEach
 {
   private String name;
   private int price = 0;
   private int reqMoney;
   private boolean unlocked = false;
+  public static ArrayList<String> allUnlockedFood = new ArrayList<String>();
   public FoodEach(String n, int p, int r, boolean u) {
     name = n;
     price = p;
     reqMoney = r;
     unlocked = u;
+    if (u) {
+      allUnlockedFood.add(n);
+    }
   }
   public String getName() {
     return name;
@@ -29,6 +36,7 @@ public class FoodEach
     }
     if (money >= reqMoney) {
       unlocked = true;
+      allUnlockedFood.add(this.name);
       return true;
     } else {
       return false;
