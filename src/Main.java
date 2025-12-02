@@ -550,12 +550,12 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
     if (pointImage != null)
     {
       // draw point image at fixed position (not affected by uiShift)
-      drawVirtualImage(g, pointImage, 1300, 20, 50, 50);
+      drawVirtualImage(g, pointImage, 250, 60, 250, 100);
     }
     if (moneyImage != null)
     {
       // draw money image at fixed position (not affected by uiShift)
-      drawVirtualImage(g, moneyImage, 1400, 20, 50, 50);
+      drawVirtualImage(g, moneyImage, 480, 60, 250, 100);
     }
 
     // draw active drag copies on top
