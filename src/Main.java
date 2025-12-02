@@ -7,6 +7,8 @@ import javax.swing.*;
 
 public class Main extends JPanel implements MouseMotionListener, MouseListener
 {
+  private boolean mouseWasReleased = false;
+  private boolean mouseWasPressed = false;
   // The variables store coordiates 
   private int mouseX = -10;
   private int mouseY = -10;
@@ -112,6 +114,7 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       final int rightX = 220 + uiShiftX;
       final int startY = 135 + uiShiftY;
       final int rowSpacing = 55;
+      //mouseWasReleased = true;
 
       // helper to check a single item at (col,row) and start drag copy if hit
       java.util.function.BiFunction<java.awt.image.BufferedImage, java.awt.Point, Boolean> tryStart = (img, pt) -> {
@@ -161,11 +164,14 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       // row9
       if (tryStart.apply(tboneImage, new Point(leftX, startY + 9*rowSpacing))) return;
       if (tryStart.apply(watermelonImage, new Point(rightX, startY + 9*rowSpacing))) return;
-    }
+      mouseWasPressed = true;
+  }
   }
 
   @Override
-  public void mouseReleased(MouseEvent e) { }
+  public void mouseReleased(MouseEvent e) {
+    mouseWasReleased = true;
+  }
 
   @Override
   public void mouseEntered(MouseEvent e) { }
@@ -245,12 +251,6 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
 
   private BufferedImage questionImage = null;
   private Imagesfood question;
-
-  private BufferedImage pointImage = null;
-  private Imagesfood point;
-  private BufferedImage moneyImage = null;
-  private Imagesfood money;
-  
   // Drag copies created when user clicks inventory items. Originals remain.
   private static class DragItem {
     BufferedImage img;
@@ -271,7 +271,9 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
   {
     super.paintComponent(g);
     // Creates a red background
+    
     g.setColor(Color.BLACK);
+    
     g.fillRect(0, 0, getWidth(), getHeight());
 
     // Precompute virtual -> actual scale and offsets so all drawings
@@ -345,7 +347,7 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       int imgX = leftX;
       int imgY = startY + row * rowSpacing;
       drawVirtualImage(g, appleImage, imgX, imgY, V_IMG_W, V_IMG_H);
-      drawVirtualString(g, "Apple, 1pt", imgX + V_IMG_W + 8, imgY + 30);
+      drawVirtualString(g, "Apple", imgX + V_IMG_W + 8, imgY + 30);
     }
     if (apple_pieImage != null)
     {
@@ -353,7 +355,7 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       int imgX = rightX;
       int imgY = startY + row * rowSpacing;
       drawVirtualImage(g, apple_pieImage, imgX, imgY, V_IMG_W, V_IMG_H);
-      drawVirtualString(g, "Apple Pie, 18pt", imgX + V_IMG_W + 8, imgY + 35);
+      drawVirtualString(g, "Apple Pie", imgX + V_IMG_W + 8, imgY + 35);
     }
     if (avocadoImage != null)
     {
@@ -361,7 +363,7 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       int imgX = leftX;
       int imgY = startY + row * rowSpacing;
       drawVirtualImage(g, avocadoImage, imgX, imgY, V_IMG_W, V_IMG_H);
-      drawVirtualString(g, "Avocado, 8pt", imgX + V_IMG_W + 8, imgY + 35);
+      drawVirtualString(g, "Avocado", imgX + V_IMG_W + 8, imgY + 35);
     }
     if (boar_headImage != null)
     {
@@ -369,7 +371,7 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       int imgX = rightX;
       int imgY = startY + row * rowSpacing;
       drawVirtualImage(g, boar_headImage, imgX, imgY, V_IMG_W, V_IMG_H);
-      drawVirtualString(g, "Boar Head, 20pt", imgX + V_IMG_W + 8, imgY + 35);
+      drawVirtualString(g, "Boar Head", imgX + V_IMG_W + 8, imgY + 35);
     }
     if (breadImage != null)
     {
@@ -377,7 +379,7 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       int imgX = leftX;
       int imgY = startY + row * rowSpacing;
       drawVirtualImage(g, breadImage, imgX, imgY, V_IMG_W, V_IMG_H);
-      drawVirtualString(g, "Bread, 2pt", imgX + V_IMG_W + 8, imgY + 35);
+      drawVirtualString(g, "Bread", imgX + V_IMG_W + 8, imgY + 35);
     }
     if (cheeseImage != null)
     {
@@ -385,7 +387,7 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       int imgX = rightX;
       int imgY = startY + row * rowSpacing;
       drawVirtualImage(g, cheeseImage, imgX, imgY, V_IMG_W, V_IMG_H);
-      drawVirtualString(g, "Cheese, 3pt", imgX + V_IMG_W + 8, imgY + 35);
+      drawVirtualString(g, "Cheese", imgX + V_IMG_W + 8, imgY + 35);
     }
     if (cheesecakeImage != null)
     {
@@ -393,7 +395,7 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       int imgX = leftX;
       int imgY = startY + row * rowSpacing;
       drawVirtualImage(g, cheesecakeImage, imgX, imgY, V_IMG_W, V_IMG_H);
-      drawVirtualString(g, "Cheesecake, 17pt", imgX + V_IMG_W + 8, imgY + 35);
+      drawVirtualString(g, "Cheesecake", imgX + V_IMG_W + 8, imgY + 35);
     }
     if (chickenImage != null)
     {
@@ -401,7 +403,7 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       int imgX = rightX;
       int imgY = startY + row * rowSpacing;
       drawVirtualImage(g, chickenImage, imgX, imgY, V_IMG_W, V_IMG_H);
-      drawVirtualString(g, "Chicken, 7pt", imgX + V_IMG_W + 8, imgY + 35);
+      drawVirtualString(g, "Chicken", imgX + V_IMG_W + 8, imgY + 35);
     }
     if (cookieImage != null)
     {
@@ -409,7 +411,7 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       int imgX = leftX;
       int imgY = startY + row * rowSpacing;
       drawVirtualImage(g, cookieImage, imgX, imgY, V_IMG_W, V_IMG_H);
-      drawVirtualString(g, "Cookie, 11pt", imgX + V_IMG_W + 8, imgY + 35);
+      drawVirtualString(g, "Cookie", imgX + V_IMG_W + 8, imgY + 35);
     }
     if (dragon_fruitImage != null)
     {
@@ -417,7 +419,7 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       int imgX = rightX;
       int imgY = startY + row * rowSpacing;
       drawVirtualImage(g, dragon_fruitImage, imgX, imgY, V_IMG_W, V_IMG_H);
-      drawVirtualString(g, "Dragon Fruit, 19pt", imgX + V_IMG_W + 8, imgY + 35);
+      drawVirtualString(g, "Dragon Fruit", imgX + V_IMG_W + 8, imgY + 35);
     }
 
     if (fishImage != null)
@@ -426,7 +428,7 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       int imgX = leftX;
       int imgY = startY + row * rowSpacing;
       drawVirtualImage(g, fishImage, imgX, imgY, V_IMG_W, V_IMG_H);
-      drawVirtualString(g, "Fish, 5pt", imgX + V_IMG_W + 8, imgY + 35);
+      drawVirtualString(g, "Fish", imgX + V_IMG_W + 8, imgY + 35);
     }
 
     if (fried_eggsImage != null)
@@ -435,7 +437,7 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       int imgX = rightX;
       int imgY = startY + row * rowSpacing;
       drawVirtualImage(g, fried_eggsImage, imgX, imgY, V_IMG_W, V_IMG_H);
-      drawVirtualString(g, "Fried Eggs, 10pt", imgX + V_IMG_W + 8, imgY + 35);
+      drawVirtualString(g, "Fried Eggs", imgX + V_IMG_W + 8, imgY + 35);
     }
 
     if (honeyImage != null)
@@ -444,7 +446,7 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       int imgX = leftX;
       int imgY = startY + row * rowSpacing;
       drawVirtualImage(g, honeyImage, imgX, imgY, V_IMG_W, V_IMG_H);
-      drawVirtualString(g, "Honey, 6pt", imgX + V_IMG_W + 8, imgY + 35);
+      drawVirtualString(g, "Honey", imgX + V_IMG_W + 8, imgY + 35);
     }
 
     if (pineappleImage != null)
@@ -453,7 +455,7 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       int imgX = rightX;
       int imgY = startY + row * rowSpacing;
       drawVirtualImage(g, pineappleImage, imgX, imgY, V_IMG_W, V_IMG_H);
-      drawVirtualString(g, "Pineapple, 12pt", imgX + V_IMG_W + 8, imgY + 35);
+      drawVirtualString(g, "Pineapple", imgX + V_IMG_W + 8, imgY + 35);
     }
 
     if (pretzelImage != null)
@@ -462,7 +464,7 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       int imgX = leftX;
       int imgY = startY + row * rowSpacing;
       drawVirtualImage(g, pretzelImage, imgX, imgY, V_IMG_W, V_IMG_H);
-      drawVirtualString(g, "Pretzel, 14pt", imgX + V_IMG_W + 8, imgY + 35);
+      drawVirtualString(g, "Pretzel", imgX + V_IMG_W + 8, imgY + 35);
     }
 
     if (pumpkin_pieImage != null)
@@ -471,7 +473,7 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       int imgX = rightX;
       int imgY = startY + row * rowSpacing;
       drawVirtualImage(g, pumpkin_pieImage, imgX, imgY, V_IMG_W, V_IMG_H);
-      drawVirtualString(g, "Pumpkin Pie, 16pt", imgX + V_IMG_W + 8, imgY + 35);
+      drawVirtualString(g, "Pumpkin Pie", imgX + V_IMG_W + 8, imgY + 35);
     }
 
     if (shrimpImage != null)
@@ -480,7 +482,7 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       int imgX = leftX;
       int imgY = startY + row * rowSpacing;
       drawVirtualImage(g, shrimpImage, imgX, imgY, V_IMG_W, V_IMG_H);
-      drawVirtualString(g, "Shrimp, 9pt", imgX + V_IMG_W + 8, imgY + 35);
+      drawVirtualString(g, "Shrimp", imgX + V_IMG_W + 8, imgY + 35);
     }
     
     if (sushiImage != null)
@@ -489,7 +491,7 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       int imgX = rightX;
       int imgY = startY + row * rowSpacing;
       drawVirtualImage(g, sushiImage, imgX, imgY, V_IMG_W, V_IMG_H);
-      drawVirtualString(g, "Sushi, 13pt", imgX + V_IMG_W + 8, imgY + 35);
+      drawVirtualString(g, "Sushi", imgX + V_IMG_W + 8, imgY + 35);
     }
 
     if (tboneImage != null)
@@ -498,7 +500,7 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       int imgX = leftX;
       int imgY = startY + row * rowSpacing;
       drawVirtualImage(g, tboneImage, imgX, imgY, V_IMG_W, V_IMG_H);
-      drawVirtualString(g, "T-Bone, 15pt", imgX + V_IMG_W + 8, imgY + 35);
+      drawVirtualString(g, "T-Bone", imgX + V_IMG_W + 8, imgY + 35);
     }
     
     if (watermelonImage != null)
@@ -507,7 +509,7 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       int imgX = rightX;
       int imgY = startY + row * rowSpacing;
       drawVirtualImage(g, watermelonImage, imgX, imgY, V_IMG_W, V_IMG_H);
-      drawVirtualString(g, "Watermelon, 4pt", imgX + V_IMG_W + 8, imgY + 35);
+      drawVirtualString(g, "Watermelon", imgX + V_IMG_W + 8, imgY + 35);
     }
     }
 
@@ -545,17 +547,6 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
     {
       // draw question image at fixed position (not affected by uiShift)
       drawVirtualImage(g, questionImage, 800, 80, 150, 150);
-    }
-
-    if (pointImage != null)
-    {
-      // draw point image at fixed position (not affected by uiShift)
-      drawVirtualImage(g, pointImage, 250, 60, 250, 100);
-    }
-    if (moneyImage != null)
-    {
-      // draw money image at fixed position (not affected by uiShift)
-      drawVirtualImage(g, moneyImage, 480, 60, 250, 100);
     }
 
     // draw active drag copies on top
@@ -742,11 +733,6 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
 
             panel.question = new Imagesfood("question");
             panel.questionImage = panel.question.getImage();
-
-            panel.point = new Imagesfood("point");
-            panel.pointImage = panel.point.getImage();
-            panel.money = new Imagesfood("money");
-            panel.moneyImage = panel.money.getImage();
 
             // cursor image removed - use system cursor instead
 
