@@ -245,6 +245,12 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
 
   private BufferedImage questionImage = null;
   private Imagesfood question;
+
+  private BufferedImage pointImage = null;
+  private Imagesfood point;
+  private BufferedImage moneyImage = null;
+  private Imagesfood money;
+  
   // Drag copies created when user clicks inventory items. Originals remain.
   private static class DragItem {
     BufferedImage img;
@@ -541,6 +547,17 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       drawVirtualImage(g, questionImage, 800, 80, 150, 150);
     }
 
+    if (pointImage != null)
+    {
+      // draw point image at fixed position (not affected by uiShift)
+      drawVirtualImage(g, pointImage, 1300, 20, 50, 50);
+    }
+    if (moneyImage != null)
+    {
+      // draw money image at fixed position (not affected by uiShift)
+      drawVirtualImage(g, moneyImage, 1400, 20, 50, 50);
+    }
+
     // draw active drag copies on top
     if (!activeDrags.isEmpty()) {
       for (DragItem d : activeDrags) {
@@ -725,6 +742,11 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
 
             panel.question = new Imagesfood("question");
             panel.questionImage = panel.question.getImage();
+
+            panel.point = new Imagesfood("point");
+            panel.pointImage = panel.point.getImage();
+            panel.money = new Imagesfood("money");
+            panel.moneyImage = panel.money.getImage();
 
             // cursor image removed - use system cursor instead
 
