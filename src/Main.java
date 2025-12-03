@@ -784,21 +784,39 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
           
             // Load customer2 image after 10 seconds
             Timer delayedImageTimer = new Timer(2000, e -> {
-                panel.customer2 = new Imagesfood("customer2_idle/1");
-                panel.customer2Image = panel.customer2.getImage();
-                System.out.println("Delayed customer2 image loaded: " + (panel.customer2Image != null));
-                panel.cloud = new Imagesfood("cloud");
-                panel.cloudImage = panel.cloud.getImage(); 
-                System.out.println("Delayed cloud image loaded: " + (panel.cloudImage != null));
-              // load an apple to appear inside the cloud
-              panel.cloudApple = new Imagesfood("apple");
-              panel.cloudAppleImage = panel.cloudApple.getImage(); 
-              panel.showCloudApple = (panel.cloudAppleImage != null);
-              System.out.println("Delayed cloud-apple image loaded: " + (panel.cloudAppleImage != null));
-                panel.repaint();
+                  panel.customer2 = new Imagesfood("customer2_idle/1");
+                  panel.customer2Image = panel.customer2.getImage();
+                  System.out.println("Delayed customer2 image loaded: " + (panel.customer2Image != null));
+                  panel.cloud = new Imagesfood("cloud");
+                  panel.cloudImage = panel.cloud.getImage(); 
+                  System.out.println("Delayed cloud image loaded: " + (panel.cloudImage != null));
+                // load an apple to appear inside the cloud
+                panel.cloudApple = new Imagesfood("apple");
+                panel.cloudAppleImage = panel.cloudApple.getImage(); 
+                panel.showCloudApple = (panel.cloudAppleImage != null);
+                System.out.println("Delayed cloud-apple image loaded: " + (panel.cloudAppleImage != null));
+                  panel.repaint();
             });
+            Timer delayedImageTimer1 = new Timer(3000, e -> {
+                  panel.customer2 = new Imagesfood("customer2_walking/2");
+                  panel.customer2Image = panel.customer2.getImage();
+                  System.out.println("Delayed customer2 image loaded: " + (panel.customer2Image != null));
+                  panel.cloud = new Imagesfood("cloud");
+                  panel.cloudImage = panel.cloud.getImage(); 
+                  System.out.println("Delayed cloud image loaded: " + (panel.cloudImage != null));
+                // load an apple to appear inside the cloud
+                panel.cloudApple = new Imagesfood("apple");
+                panel.cloudAppleImage = panel.cloudApple.getImage(); 
+                panel.showCloudApple = (panel.cloudAppleImage != null);
+                System.out.println("Delayed cloud-apple image loaded: " + (panel.cloudAppleImage != null));
+                  panel.repaint();
+            });
+            
+
             delayedImageTimer.setRepeats(false);
             delayedImageTimer.start();
+            delayedImageTimer1.setRepeats(false);
+            delayedImageTimer1.start();
 
             // --- Add a draggable apple component to the layered pane ---
             // Create an Imagesfood for the apple and a draggable component
