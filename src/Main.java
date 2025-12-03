@@ -251,6 +251,11 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
 
   private BufferedImage questionImage = null;
   private Imagesfood question;
+
+  private BufferedImage moneyImage = null;
+  private Imagesfood money;
+  private BufferedImage pointImage = null;
+  private Imagesfood point;
   // Drag copies created when user clicks inventory items. Originals remain.
   private static class DragItem {
     BufferedImage img;
@@ -744,6 +749,11 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
 
             panel.question = new Imagesfood("question");
             panel.questionImage = panel.question.getImage();
+
+            panel.point = new Imagesfood("point");
+            panel.pointImage = panel.point.getImage();
+            panel.money = new Imagesfood("money");
+            panel.moneyImage = panel.money.getImage();
 
             // cursor image removed - use system cursor instead
 
