@@ -14,9 +14,7 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
   private int mouseY = -10;
   private Timer refreshTimer;
   // Controls whether the inventory (tan box, outline, food images and text)
-  // are visible. Starts hidden (false).
   private boolean showInventory = false;
-  // Global UI shift (virtual coordinates). Change these to move the
   // shopping cart, background, outline, and food list by the same amount.
   private int uiShiftX = 70;
   private int uiShiftY = 50;
@@ -28,18 +26,15 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
   {
     addMouseMotionListener(this);
     addMouseListener(this);
-    // Refresh panel 60 times per second for smooth cursor tracking
     refreshTimer = new Timer(16, e -> repaint());
     refreshTimer.start();
   }
 
   @Override
-  // Updates the varibles
   public void mouseMoved(MouseEvent e)
   {
     mouseX = e.getX();
     mouseY = e.getY();
-    // update the panel immediately so cursor image follows smoothly
     repaint();
   }
 
@@ -80,7 +75,7 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
         topFrame.getLayeredPane().add(questionPanel, JLayeredPane.POPUP_LAYER);
     }
 
-    // Toggle visibility
+   
     questionVisible = !questionVisible;
     questionPanel.setVisible(questionVisible);
     questionPanel.repaint();
@@ -99,14 +94,13 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
     int vx = (int) Math.round((e.getX() - offsetX) / scale);
     int vy = (int) Math.round((e.getY() - offsetY) / scale);
 
-    // Shopping cart is drawn at base (50,70) shifted by uiShiftX/uiShiftY — toggle when clicked
+    // Shopping cart is drawn at base (50,70) shifted by uiShiftX/uiShiftY
     if (vx >= 50 + uiShiftX && vx <= 50 + uiShiftX + 60 && vy >= 70 + uiShiftY && vy <= 70 + uiShiftY + 60) {
       showInventory = !showInventory;
       repaint();
       return;
     }
 
-    // If inventory is visible, check whether user clicked on any inventory food to create a draggable copy
     if (showInventory) {
       final int V_IMG_W = 50;
       final int V_IMG_H = 50;
@@ -114,9 +108,7 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       final int rightX = 220 + uiShiftX;
       final int startY = 135 + uiShiftY;
       final int rowSpacing = 55;
-      //mouseWasReleased = true;
 
-      // helper to check a single item at (col,row) and start drag copy if hit
       java.util.function.BiFunction<java.awt.image.BufferedImage, java.awt.Point, Boolean> tryStart = (img, pt) -> {
         if (img == null) return false;
         int imgX = pt.x;
