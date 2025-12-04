@@ -787,74 +787,201 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
             System.out.println("man_idle=" + (panel.man_idleImage != null));
           
             // Load customer2 image after 10 seconds
-            Timer delayedImageTimer = new Timer(2000, e -> {
-                  panel.customer2 = new Imagesfood("customer2_idle/1");
-                  panel.customer2Image = panel.customer2.getImage();
-                  System.out.println("Delayed customer2 image loaded: " + (panel.customer2Image != null));
-                  panel.cloud = new Imagesfood("cloud");
-                  panel.cloudImage = panel.cloud.getImage(); 
-                  System.out.println("Delayed cloud image loaded: " + (panel.cloudImage != null));
-                // load an apple to appear inside the cloud
-                panel.cloudApple = new Imagesfood("apple");
-                panel.cloudAppleImage = panel.cloudApple.getImage(); 
-                panel.showCloudApple = (panel.cloudAppleImage != null);
-                System.out.println("Delayed cloud-apple image loaded: " + (panel.cloudAppleImage != null));
-                  panel.repaint();
-            });
-            Timer delayedImageTimer1 = new Timer(3000, e -> {
-                  panel.customer2 = new Imagesfood("customer2_walking/2");
-                  panel.customer2Image = panel.customer2.getImage();
-                  System.out.println("Delayed customer2 image loaded: " + (panel.customer2Image != null));
-                  panel.cloud = new Imagesfood("cloud");
-                  panel.cloudImage = panel.cloud.getImage(); 
-                  System.out.println("Delayed cloud image loaded: " + (panel.cloudImage != null));
-                // load an apple to appear inside the cloud
-                panel.cloudApple = new Imagesfood("apple");
-                panel.cloudAppleImage = panel.cloudApple.getImage(); 
-                panel.showCloudApple = (panel.cloudAppleImage != null);
-                System.out.println("Delayed cloud-apple image loaded: " + (panel.cloudAppleImage != null));
-                  panel.repaint();
-            });
-          
-            // Load customer2 image after 10 seconds
-            Timer delayedImageTimer2 = new Timer(2000, e -> {
-                  panel.customer2 = new Imagesfood("customer2_idle/1");
-                  panel.customer2Image = panel.customer2.getImage();
-                  System.out.println("Delayed customer2 image loaded: " + (panel.customer2Image != null));
-                  panel.cloud = new Imagesfood("cloud");
-                  panel.cloudImage = panel.cloud.getImage(); 
-                  System.out.println("Delayed cloud image loaded: " + (panel.cloudImage != null));
-                // load an apple to appear inside the cloud
-                panel.cloudApple = new Imagesfood("apple");
-                panel.cloudAppleImage = panel.cloudApple.getImage(); 
-                panel.showCloudApple = (panel.cloudAppleImage != null);
-                System.out.println("Delayed cloud-apple image loaded: " + (panel.cloudAppleImage != null));
-                  panel.repaint();
-            });
-            Timer delayedImageTimer3 = new Timer(3000, e -> {
-                  panel.customer2 = new Imagesfood("customer2_walking/2");
-                  panel.customer2Image = panel.customer2.getImage();
-                  System.out.println("Delayed customer2 image loaded: " + (panel.customer2Image != null));
-                  panel.cloud = new Imagesfood("cloud");
-                  panel.cloudImage = panel.cloud.getImage(); 
-                  System.out.println("Delayed cloud image loaded: " + (panel.cloudImage != null));
-                // load an apple to appear inside the cloud
-                panel.cloudApple = new Imagesfood("apple");
-                panel.cloudAppleImage = panel.cloudApple.getImage(); 
-                panel.showCloudApple = (panel.cloudAppleImage != null);
-                System.out.println("Delayed cloud-apple image loaded: " + (panel.cloudAppleImage != null));
-                  panel.repaint();
-            });
-            
+           Timer delayedImageTimer = new Timer(2000, e -> {
+                    panel.customer2 = new Imagesfood("customer2_idle/1");
+                    panel.customer2Image = panel.customer2.getImage();
+                    System.out.println("Delayed customer2 image loaded: " + (panel.customer2Image != null));
+                    panel.cloud = new Imagesfood("cloud");
+                    panel.cloudImage = panel.cloud.getImage(); 
+                    System.out.println("Delayed cloud image loaded: " + (panel.cloudImage != null));
+                  // load an apple to appear inside the cloud
+                  panel.cloudApple = new Imagesfood("apple");
+                  panel.cloudAppleImage = panel.cloudApple.getImage(); 
+                  panel.showCloudApple = (panel.cloudAppleImage != null);
+                  System.out.println("Delayed cloud-apple image loaded: " + (panel.cloudAppleImage != null));
+                  
+                    panel.repaint();
+              });
+              Timer delayedImageTimer1 = new Timer(2500, e -> {
+                    panel.customer2 = new Imagesfood("customer2_walking/1");
+                    panel.customer2Image = panel.customer2.getImage();
+                    System.out.println("Delayed customer2 image loaded: " + (panel.customer2Image != null));
+                    panel.cloud = new Imagesfood("cloud");
+                    panel.cloudImage = panel.cloud.getImage(); 
+                    System.out.println("Delayed cloud image loaded: " + (panel.cloudImage != null));
+                  // load an apple to appear inside the cloud
+                  panel.cloudApple = new Imagesfood("apple");
+                  panel.cloudAppleImage = panel.cloudApple.getImage(); 
+                  panel.showCloudApple = (panel.cloudAppleImage != null);
+                  System.out.println("Delayed cloud-apple image loaded: " + (panel.cloudAppleImage != null));
+                  //panel.customer2Image.moveObject();
+                    panel.repaint();
+              });
+              Timer delayedImageTimer2 = new Timer(3000, e -> {
+                    panel.customer2 = new Imagesfood("customer2_walking/2");
+                    panel.customer2Image = panel.customer2.getImage();
+                    System.out.println("Delayed customer2 image loaded: " + (panel.customer2Image != null));
+                    panel.cloud = new Imagesfood("cloud");
+                    panel.cloudImage = panel.cloud.getImage(); 
+                    System.out.println("Delayed cloud image loaded: " + (panel.cloudImage != null));
+                  // load an apple to appear inside the cloud
+                  panel.cloudApple = new Imagesfood("apple");
+                  panel.cloudAppleImage = panel.cloudApple.getImage(); 
+                  panel.showCloudApple = (panel.cloudAppleImage != null);
+                  System.out.println("Delayed cloud-apple image loaded: " + (panel.cloudAppleImage != null));
+                  
+                    panel.repaint();
+              });
+              Timer delayedImageTimer3 = new Timer(3500, e -> {
+                    panel.customer2 = new Imagesfood("customer2_walking/3");
+                    panel.customer2Image = panel.customer2.getImage();
+                    System.out.println("Delayed customer2 image loaded: " + (panel.customer2Image != null));
+                    panel.cloud = new Imagesfood("cloud");
+                    panel.cloudImage = panel.cloud.getImage(); 
+                    System.out.println("Delayed cloud image loaded: " + (panel.cloudImage != null));
+                  // load an apple to appear inside the cloud
+                  panel.cloudApple = new Imagesfood("apple");
+                  panel.cloudAppleImage = panel.cloudApple.getImage(); 
+                  panel.showCloudApple = (panel.cloudAppleImage != null);
+                  System.out.println("Delayed cloud-apple image loaded: " + (panel.cloudAppleImage != null));
+                  //panel.customer2Image.drawImage(src, 0, 0, targetW, targetH, null);
+              });
+              Timer delayedImageTimer4 = new Timer(4000, e -> {
+                    panel.customer2 = new Imagesfood("customer2_walking/4");
+                    panel.customer2Image = panel.customer2.getImage();
+                    System.out.println("Delayed customer2 image loaded: " + (panel.customer2Image != null));
+                    panel.cloud = new Imagesfood("cloud");
+                    panel.cloudImage = panel.cloud.getImage(); 
+                    System.out.println("Delayed cloud image loaded: " + (panel.cloudImage != null));
+                  // load an apple to appear inside the cloud
+                  panel.cloudApple = new Imagesfood("apple");
+                  panel.cloudAppleImage = panel.cloudApple.getImage(); 
+                  panel.showCloudApple = (panel.cloudAppleImage != null);
+                  System.out.println("Delayed cloud-apple image loaded: " + (panel.cloudAppleImage != null));
+                  
+                    panel.repaint();
+              });
+              Timer delayedImageTimer5 = new Timer(4500, e -> {
+                    panel.customer2 = new Imagesfood("customer2_walking/5");
+                    panel.customer2Image = panel.customer2.getImage();
+                    System.out.println("Delayed customer2 image loaded: " + (panel.customer2Image != null));
+                    panel.cloud = new Imagesfood("cloud");
+                    panel.cloudImage = panel.cloud.getImage(); 
+                    System.out.println("Delayed cloud image loaded: " + (panel.cloudImage != null));
+                  // load an apple to appear inside the cloud
+                  panel.cloudApple = new Imagesfood("apple");
+                  panel.cloudAppleImage = panel.cloudApple.getImage(); 
+                  panel.showCloudApple = (panel.cloudAppleImage != null);
+                  System.out.println("Delayed cloud-apple image loaded: " + (panel.cloudAppleImage != null));
+                  //panel.customer2Image.moveObject();
+                    panel.repaint();
+              });
+              Timer delayedImageTimer6 = new Timer(5000, e -> {
+                    panel.customer2 = new Imagesfood("customer2_walking/6");
+                    panel.customer2Image = panel.customer2.getImage();
+                    System.out.println("Delayed customer2 image loaded: " + (panel.customer2Image != null));
+                    panel.cloud = new Imagesfood("cloud");
+                    panel.cloudImage = panel.cloud.getImage(); 
+                    System.out.println("Delayed cloud image loaded: " + (panel.cloudImage != null));
+                  // load an apple to appear inside the cloud
+                  panel.cloudApple = new Imagesfood("apple");
+                  panel.cloudAppleImage = panel.cloudApple.getImage(); 
+                  panel.showCloudApple = (panel.cloudAppleImage != null);
+                  System.out.println("Delayed cloud-apple image loaded: " + (panel.cloudAppleImage != null));
+                  
+                    panel.repaint();
+              });
+              Timer delayedImageTimer7 = new Timer(5500, e -> {
+                    panel.customer2 = new Imagesfood("customer2_walking/7");
+                    panel.customer2Image = panel.customer2.getImage();
+                    System.out.println("Delayed customer2 image loaded: " + (panel.customer2Image != null));
+                    panel.cloud = new Imagesfood("cloud");
+                    panel.cloudImage = panel.cloud.getImage(); 
+                    System.out.println("Delayed cloud image loaded: " + (panel.cloudImage != null));
+                  // load an apple to appear inside the cloud
+                  panel.cloudApple = new Imagesfood("apple");
+                  panel.cloudAppleImage = panel.cloudApple.getImage(); 
+                  panel.showCloudApple = (panel.cloudAppleImage != null);
+                  System.out.println("Delayed cloud-apple image loaded: " + (panel.cloudAppleImage != null));
+                  //panel.customer2Image.drawImage(src, 0, 0, targetW, targetH, null);
+              });
+              Timer delayedImageTimer8 = new Timer(6000, e -> {
+                    panel.customer2 = new Imagesfood("customer2_walking/8");
+                    panel.customer2Image = panel.customer2.getImage();
+                    System.out.println("Delayed customer2 image loaded: " + (panel.customer2Image != null));
+                    panel.cloud = new Imagesfood("cloud");
+                    panel.cloudImage = panel.cloud.getImage(); 
+                    System.out.println("Delayed cloud image loaded: " + (panel.cloudImage != null));
+                  // load an apple to appear inside the cloud
+                  panel.cloudApple = new Imagesfood("apple");
+                  panel.cloudAppleImage = panel.cloudApple.getImage(); 
+                  panel.showCloudApple = (panel.cloudAppleImage != null);
+                  System.out.println("Delayed cloud-apple image loaded: " + (panel.cloudAppleImage != null));
+                  //panel.customer2Image.drawImage(src, 0, 0, targetW, targetH, null);
+              });
+              Timer delayedImageTimer9 = new Timer(6500, e -> {
+                    panel.customer2 = new Imagesfood("customer2_walking/9");
+                    panel.customer2Image = panel.customer2.getImage();
+                    System.out.println("Delayed customer2 image loaded: " + (panel.customer2Image != null));
+                    panel.cloud = new Imagesfood("cloud");
+                    panel.cloudImage = panel.cloud.getImage(); 
+                    System.out.println("Delayed cloud image loaded: " + (panel.cloudImage != null));
+                  // load an apple to appear inside the cloud
+                  panel.cloudApple = new Imagesfood("apple");
+                  panel.cloudAppleImage = panel.cloudApple.getImage(); 
+                  panel.showCloudApple = (panel.cloudAppleImage != null);
+                  System.out.println("Delayed cloud-apple image loaded: " + (panel.cloudAppleImage != null));
+                  //panel.customer2Image.drawImage(src, 0, 0, targetW, targetH, null);
+              });
+              Timer delayedImageTimer10 = new Timer(7000, e -> {
+                    panel.customer2 = new Imagesfood("customer2_walking/10");
+                    panel.customer2Image = panel.customer2.getImage();
+                    System.out.println("Delayed customer2 image loaded: " + (panel.customer2Image != null));
+                    panel.cloud = new Imagesfood("cloud");
+                    panel.cloudImage = panel.cloud.getImage(); 
+                    System.out.println("Delayed cloud image loaded: " + (panel.cloudImage != null));
+                  // load an apple to appear inside the cloud
+                  panel.cloudApple = new Imagesfood("apple");
+                  panel.cloudAppleImage = panel.cloudApple.getImage(); 
+                  panel.showCloudApple = (panel.cloudAppleImage != null);
+                  System.out.println("Delayed cloud-apple image loaded: " + (panel.cloudAppleImage != null));
+                  //panel.customer2Image.drawImage(src, 0, 0, targetW, targetH, null);
+              });
+              
 
-            delayedImageTimer.setRepeats(false);
-            delayedImageTimer.start();
-            delayedImageTimer1.setRepeats(false);
-            delayedImageTimer1.start();
-            delayedImageTimer2.setRepeats(false);
-            delayedImageTimer2.start();
-            delayedImageTimer3.setRepeats(false);
-            delayedImageTimer3.start();
+              delayedImageTimer.setRepeats(true);
+              
+              delayedImageTimer1.setRepeats(true);
+              
+              delayedImageTimer2.setRepeats(true);
+              //delayedImageTimer2.start();
+              delayedImageTimer3.setRepeats(true);
+              //delayedImageTimer3.start();
+              delayedImageTimer4.setRepeats(true);
+              //delayedImageTimer4.start();
+              delayedImageTimer5.setRepeats(true);
+              //delayedImageTimer5.start();
+              delayedImageTimer6.setRepeats(true);
+              //delayedImageTimer6.start();
+              delayedImageTimer7.setRepeats(true);
+              //delayedImageTimer7.start();
+              delayedImageTimer8.setRepeats(true);
+              //delayedImageTimer8.start();
+              delayedImageTimer9.setRepeats(true);
+              //delayedImageTimer9.start();
+              delayedImageTimer10.setRepeats(true);
+             // delayedImageTimer10.start();
+              delayedImageTimer.start();
+              delayedImageTimer1.start();
+              delayedImageTimer2.start();
+              delayedImageTimer3.start();
+              delayedImageTimer4.start();
+              delayedImageTimer5.start();
+              delayedImageTimer6.start();
+              delayedImageTimer7.start();
+              delayedImageTimer8.start();
+              delayedImageTimer9.start();
+              delayedImageTimer10.start();
 
             // --- Add a draggable apple component to the layered pane ---
             // Create an Imagesfood for the apple and a draggable component
