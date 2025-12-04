@@ -747,6 +747,18 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
             panel.money = new Imagesfood("money");
             panel.moneyImage = panel.money.getImage();
 
+            JLabel pointLable = new JLabel();
+            pointLable.setBounds(390, 124, 500, 100); // wide enough for the panel
+            pointLable.setFont(new Font("Arial", Font.BOLD, 40));
+            pointLable.setText(100 + "");
+            panel.add(pointLable);
+
+            JLabel moneyLable = new JLabel();
+            moneyLable.setBounds(610, 127, 250, 100); // wide enough for the panel
+            moneyLable.setFont(new Font("Arial", Font.BOLD, 40));
+            moneyLable.setText(500 + "");
+            panel.add(moneyLable);
+
             // cursor image removed - use system cursor instead
 
             // Debug: print which images loaded successfully
