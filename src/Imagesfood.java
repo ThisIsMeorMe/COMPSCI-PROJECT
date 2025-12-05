@@ -6,15 +6,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-
 public class Imagesfood {
     private String name;
     private BufferedImage image;
 
-    
-     
-     
-     
     public Imagesfood(String imagename) {
         this.name = imagename;
         try {
@@ -83,7 +78,6 @@ public class Imagesfood {
         return image;
     }
 
-    
     public JComponent createDraggableComponent(int startX, int startY) {
         if (image == null) {
             JPanel empty = new JPanel();
