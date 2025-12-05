@@ -1,4 +1,3 @@
-//  IMPORTS
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
@@ -7,6 +6,8 @@ import javax.swing.*;
 
 public class Main extends JPanel implements MouseMotionListener, MouseListener
 {
+  
+  public static Main mainInstance = null;
   private boolean mouseWasReleased = false;
   private boolean mouseWasPressed = false;
   
@@ -17,7 +18,8 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
   private boolean showInventory = false;
   
   private int uiShiftX = 70;
-  private int uiShiftY = 50;
+  
+  private int uiShiftY = 20;
   
   private QuestionPanel questionPanel = null;
   private boolean questionVisible = false;
@@ -26,8 +28,81 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
   {
     addMouseMotionListener(this);
     addMouseListener(this);
-    refreshTimer = new Timer(16, e -> repaint());
+    refreshTimer = new Timer(16, e -> { updatePositions(); repaint(); });
     refreshTimer.start();
+  }
+
+  
+  private void updatePositions() {
+    long now = System.currentTimeMillis();
+    long last = lastUpdateMillis <= 0 ? now : lastUpdateMillis;
+    double dt = Math.max(0.0, (now - last) / 1000.0);
+    lastUpdateMillis = now;
+
+    
+    if (customer2SpawnTimeMillis > 0L) {
+      long waited = now - customer2SpawnTimeMillis;
+      if (waited < customer2StartDelayMs) {
+        
+        lastUpdateMillis = now;
+        return;
+      } else {
+        
+        customer2Visible = true;
+        customer2SpawnTimeMillis = 0L;
+        
+        lastUpdateMillis = now;
+        return; 
+      }
+    }
+
+    
+    if (customer2State != 2) {
+      int targetManX = 1300; 
+      int targetManY = 520;  
+      
+      double finalY = targetManY - customer2FinalOffsetBelow;
+      double vFinalX = targetManX; 
+
+      if (customer2State == 0) {
+        
+        double dy = customer2Speed * dt;
+        if (customer2VerticalMovementStart == 0L) {
+          customer2VerticalMovementStart = now;
+          customer2VerticalMovementAccum = 0L;
+          customer2AnimationPaused = false;
+          customer2PausedFrameIndex = -1;
+        }
+        if (customer2Vy <= finalY) {
+          
+          customer2Vy = finalY;
+          customer2State = 1; 
+        } else {
+          double newY = customer2Vy - dy;
+          if (newY <= finalY) {
+            customer2Vy = finalY;
+            customer2State = 1;
+          } else {
+            customer2Vy = newY;
+            customer2VerticalMovementAccum += (long) (dt * 1000.0);
+              
+          }
+        }
+      } else if (customer2State == 1) {
+        
+        
+        double vFinalXFrac = customer2InitialVx + (vFinalX - customer2InitialVx) * customer2HorizontalFraction;
+        double dx = customer2Speed * dt;
+        if (Math.abs(customer2Vx - vFinalXFrac) <= dx) {
+          customer2Vx = vFinalXFrac;
+          customer2State = 2; 
+        } else if (customer2Vx < vFinalXFrac) {
+          customer2Vx += dx;
+        } else {
+          customer2Vx -= dx;
+        }
+      }
+    }
   }
 
   @Override
@@ -109,53 +184,291 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       final int startY = 135 + uiShiftY;
       final int rowSpacing = 55;
 
-      java.util.function.BiFunction<java.awt.image.BufferedImage, java.awt.Point, Boolean> tryStart = (img, pt) -> {
-        if (img == null) return false;
-        int imgX = pt.x;
-        int imgY = pt.y;
+      
+      
+      if (appleImage != null && !isFoodUnlocked("apple")) {
+        int imgX = leftX, imgY = startY + 0*rowSpacing;
         if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
-          DragItem di = new DragItem(img, imgX, imgY, V_IMG_W, V_IMG_H);
-          di.offsetX = vx - imgX;
-          di.offsetY = vy - imgY;
-          activeDrags.add(di);
-          currentDrag = di;
-          repaint();
-          return true;
+          attemptUnlock("apple"); return;
         }
-        return false;
-      };
+      }
+      if (apple_pieImage != null && !isFoodUnlocked("apple_pie")) {
+        int imgX = rightX, imgY = startY + 0*rowSpacing;
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+          attemptUnlock("apple_pie"); return;
+        }
+      }
+      if (avocadoImage != null && !isFoodUnlocked("avocado")) {
+        int imgX = leftX, imgY = startY + 1*rowSpacing;
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+          attemptUnlock("avocado"); return;
+        }
+      }
+      if (boar_headImage != null && !isFoodUnlocked("boar_head")) {
+        int imgX = rightX, imgY = startY + 1*rowSpacing;
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+          attemptUnlock("boar_head"); return;
+        }
+      }
+      if (breadImage != null && !isFoodUnlocked("bread")) {
+        int imgX = leftX, imgY = startY + 2*rowSpacing;
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+          attemptUnlock("bread"); return;
+        }
+      }
+      if (cheeseImage != null && !isFoodUnlocked("cheese")) {
+        int imgX = rightX, imgY = startY + 2*rowSpacing;
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+          attemptUnlock("cheese"); return;
+        }
+      }
+      if (cheesecakeImage != null && !isFoodUnlocked("cheesecake")) {
+        int imgX = leftX, imgY = startY + 3*rowSpacing;
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+          attemptUnlock("cheesecake"); return;
+        }
+      }
+      if (chickenImage != null && !isFoodUnlocked("chicken")) {
+        int imgX = rightX, imgY = startY + 3*rowSpacing;
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+          attemptUnlock("chicken"); return;
+        }
+      }
+      if (cookieImage != null && !isFoodUnlocked("cookie")) {
+        int imgX = leftX, imgY = startY + 4*rowSpacing;
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+          attemptUnlock("cookie"); return;
+        }
+      }
+      if (dragon_fruitImage != null && !isFoodUnlocked("dragon_fruit")) {
+        int imgX = rightX, imgY = startY + 4*rowSpacing;
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+          attemptUnlock("dragon_fruit"); return;
+        }
+      }
+      if (fishImage != null && !isFoodUnlocked("fish")) {
+        int imgX = leftX, imgY = startY + 5*rowSpacing;
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+          attemptUnlock("fish"); return;
+        }
+      }
+      if (fried_eggsImage != null && !isFoodUnlocked("fried_eggs")) {
+        int imgX = rightX, imgY = startY + 5*rowSpacing;
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+          attemptUnlock("fried_eggs"); return;
+        }
+      }
+      if (honeyImage != null && !isFoodUnlocked("honey")) {
+        int imgX = leftX, imgY = startY + 6*rowSpacing;
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+          attemptUnlock("honey"); return;
+        }
+      }
+      if (pineappleImage != null && !isFoodUnlocked("pineapple")) {
+        int imgX = rightX, imgY = startY + 6*rowSpacing;
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+          attemptUnlock("pineapple"); return;
+        }
+      }
+      if (pretzelImage != null && !isFoodUnlocked("pretzel")) {
+        int imgX = leftX, imgY = startY + 7*rowSpacing;
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+          attemptUnlock("pretzel"); return;
+        }
+      }
+      if (pumpkin_pieImage != null && !isFoodUnlocked("pumpkin_pie")) {
+        int imgX = rightX, imgY = startY + 7*rowSpacing;
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+          attemptUnlock("pumpkin_pie"); return;
+        }
+      }
+      if (shrimpImage != null && !isFoodUnlocked("shrimp")) {
+        int imgX = leftX, imgY = startY + 8*rowSpacing;
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+          attemptUnlock("shrimp"); return;
+        }
+      }
+      if (sushiImage != null && !isFoodUnlocked("sushi")) {
+        int imgX = rightX, imgY = startY + 8*rowSpacing;
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+          attemptUnlock("sushi"); return;
+        }
+      }
+      if (tboneImage != null && !isFoodUnlocked("t-bone")) {
+        int imgX = leftX, imgY = startY + 9*rowSpacing;
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+          attemptUnlock("t-bone"); return;
+        }
+      }
+      if (watermelonImage != null && !isFoodUnlocked("watermelon")) {
+        int imgX = rightX, imgY = startY + 9*rowSpacing;
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+          attemptUnlock("watermelon"); return;
+        }
+      }
 
       
       
-      if (tryStart.apply(appleImage, new Point(leftX, startY + 0*rowSpacing))) return;
-      if (tryStart.apply(apple_pieImage, new Point(rightX, startY + 0*rowSpacing))) return;
-      
-      if (tryStart.apply(avocadoImage, new Point(leftX, startY + 1*rowSpacing))) return;
-      if (tryStart.apply(boar_headImage, new Point(rightX, startY + 1*rowSpacing))) return;
-      
-      if (tryStart.apply(breadImage, new Point(leftX, startY + 2*rowSpacing))) return;
-      if (tryStart.apply(cheeseImage, new Point(rightX, startY + 2*rowSpacing))) return;
-      
-      if (tryStart.apply(cheesecakeImage, new Point(leftX, startY + 3*rowSpacing))) return;
-      if (tryStart.apply(chickenImage, new Point(rightX, startY + 3*rowSpacing))) return;
-      
-      if (tryStart.apply(cookieImage, new Point(leftX, startY + 4*rowSpacing))) return;
-      if (tryStart.apply(dragon_fruitImage, new Point(rightX, startY + 4*rowSpacing))) return;
-      
-      if (tryStart.apply(fishImage, new Point(leftX, startY + 5*rowSpacing))) return;
-      if (tryStart.apply(fried_eggsImage, new Point(rightX, startY + 5*rowSpacing))) return;
-      
-      if (tryStart.apply(honeyImage, new Point(leftX, startY + 6*rowSpacing))) return;
-      if (tryStart.apply(pineappleImage, new Point(rightX, startY + 6*rowSpacing))) return;
-      
-      if (tryStart.apply(pretzelImage, new Point(leftX, startY + 7*rowSpacing))) return;
-      if (tryStart.apply(pumpkin_pieImage, new Point(rightX, startY + 7*rowSpacing))) return;
-      
-      if (tryStart.apply(shrimpImage, new Point(leftX, startY + 8*rowSpacing))) return;
-      if (tryStart.apply(sushiImage, new Point(rightX, startY + 8*rowSpacing))) return;
-      
-      if (tryStart.apply(tboneImage, new Point(leftX, startY + 9*rowSpacing))) return;
-      if (tryStart.apply(watermelonImage, new Point(rightX, startY + 9*rowSpacing))) return;
+      if (appleImage != null && isFoodUnlocked("apple")) {
+        int imgX = leftX, imgY = startY + 0*rowSpacing;
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+          DragItem di = new DragItem(appleImage, imgX, imgY, V_IMG_W, V_IMG_H, "apple");
+          di.offsetX = vx - imgX; di.offsetY = vy - imgY;
+          activeDrags.add(di); currentDrag = di; repaint(); return;
+        }
+      }
+      if (apple_pieImage != null && isFoodUnlocked("apple_pie")) {
+        int imgX = rightX, imgY = startY + 0*rowSpacing;
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+          DragItem di = new DragItem(apple_pieImage, imgX, imgY, V_IMG_W, V_IMG_H, "apple_pie");
+          di.offsetX = vx - imgX; di.offsetY = vy - imgY;
+          activeDrags.add(di); currentDrag = di; repaint(); return;
+        }
+      }
+      if (avocadoImage != null && isFoodUnlocked("avocado")) {
+        int imgX = leftX, imgY = startY + 1*rowSpacing;
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+          DragItem di = new DragItem(avocadoImage, imgX, imgY, V_IMG_W, V_IMG_H, "avocado");
+          di.offsetX = vx - imgX; di.offsetY = vy - imgY;
+          activeDrags.add(di); currentDrag = di; repaint(); return;
+        }
+      }
+      if (boar_headImage != null && isFoodUnlocked("boar_head")) {
+        int imgX = rightX, imgY = startY + 1*rowSpacing;
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+          DragItem di = new DragItem(boar_headImage, imgX, imgY, V_IMG_W, V_IMG_H, "boar_head");
+          di.offsetX = vx - imgX; di.offsetY = vy - imgY;
+          activeDrags.add(di); currentDrag = di; repaint(); return;
+        }
+      }
+      if (breadImage != null && isFoodUnlocked("bread")) {
+        int imgX = leftX, imgY = startY + 2*rowSpacing;
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+          DragItem di = new DragItem(breadImage, imgX, imgY, V_IMG_W, V_IMG_H, "bread");
+          di.offsetX = vx - imgX; di.offsetY = vy - imgY;
+          activeDrags.add(di); currentDrag = di; repaint(); return;
+        }
+      }
+      if (cheeseImage != null && isFoodUnlocked("cheese")) {
+        int imgX = rightX, imgY = startY + 2*rowSpacing;
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+          DragItem di = new DragItem(cheeseImage, imgX, imgY, V_IMG_W, V_IMG_H, "cheese");
+          di.offsetX = vx - imgX; di.offsetY = vy - imgY;
+          activeDrags.add(di); currentDrag = di; repaint(); return;
+        }
+      }
+      if (cheesecakeImage != null && isFoodUnlocked("cheesecake")) {
+        int imgX = leftX, imgY = startY + 3*rowSpacing;
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+          DragItem di = new DragItem(cheesecakeImage, imgX, imgY, V_IMG_W, V_IMG_H, "cheesecake");
+          di.offsetX = vx - imgX; di.offsetY = vy - imgY;
+          activeDrags.add(di); currentDrag = di; repaint(); return;
+        }
+      }
+      if (chickenImage != null && isFoodUnlocked("chicken")) {
+        int imgX = rightX, imgY = startY + 3*rowSpacing;
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+          DragItem di = new DragItem(chickenImage, imgX, imgY, V_IMG_W, V_IMG_H, "chicken");
+          di.offsetX = vx - imgX; di.offsetY = vy - imgY;
+          activeDrags.add(di); currentDrag = di; repaint(); return;
+        }
+      }
+      if (cookieImage != null && isFoodUnlocked("cookie")) {
+        int imgX = leftX, imgY = startY + 4*rowSpacing;
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+          DragItem di = new DragItem(cookieImage, imgX, imgY, V_IMG_W, V_IMG_H, "cookie");
+          di.offsetX = vx - imgX; di.offsetY = vy - imgY;
+          activeDrags.add(di); currentDrag = di; repaint(); return;
+        }
+      }
+      if (dragon_fruitImage != null && isFoodUnlocked("dragon_fruit")) {
+        int imgX = rightX, imgY = startY + 4*rowSpacing;
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+          DragItem di = new DragItem(dragon_fruitImage, imgX, imgY, V_IMG_W, V_IMG_H, "dragon_fruit");
+          di.offsetX = vx - imgX; di.offsetY = vy - imgY;
+          activeDrags.add(di); currentDrag = di; repaint(); return;
+        }
+      }
+      if (fishImage != null && isFoodUnlocked("fish")) {
+        int imgX = leftX, imgY = startY + 5*rowSpacing;
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+          DragItem di = new DragItem(fishImage, imgX, imgY, V_IMG_W, V_IMG_H, "fish");
+          di.offsetX = vx - imgX; di.offsetY = vy - imgY;
+          activeDrags.add(di); currentDrag = di; repaint(); return;
+        }
+      }
+      if (fried_eggsImage != null && isFoodUnlocked("fried_eggs")) {
+        int imgX = rightX, imgY = startY + 5*rowSpacing;
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+          DragItem di = new DragItem(fried_eggsImage, imgX, imgY, V_IMG_W, V_IMG_H, "fried_eggs");
+          di.offsetX = vx - imgX; di.offsetY = vy - imgY;
+          activeDrags.add(di); currentDrag = di; repaint(); return;
+        }
+      }
+      if (honeyImage != null && isFoodUnlocked("honey")) {
+        int imgX = leftX, imgY = startY + 6*rowSpacing;
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+          DragItem di = new DragItem(honeyImage, imgX, imgY, V_IMG_W, V_IMG_H, "honey");
+          di.offsetX = vx - imgX; di.offsetY = vy - imgY;
+          activeDrags.add(di); currentDrag = di; repaint(); return;
+        }
+      }
+      if (pineappleImage != null && isFoodUnlocked("pineapple")) {
+        int imgX = rightX, imgY = startY + 6*rowSpacing;
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+          DragItem di = new DragItem(pineappleImage, imgX, imgY, V_IMG_W, V_IMG_H, "pineapple");
+          di.offsetX = vx - imgX; di.offsetY = vy - imgY;
+          activeDrags.add(di); currentDrag = di; repaint(); return;
+        }
+      }
+      if (pretzelImage != null && isFoodUnlocked("pretzel")) {
+        int imgX = leftX, imgY = startY + 7*rowSpacing;
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+          DragItem di = new DragItem(pretzelImage, imgX, imgY, V_IMG_W, V_IMG_H, "pretzel");
+          di.offsetX = vx - imgX; di.offsetY = vy - imgY;
+          activeDrags.add(di); currentDrag = di; repaint(); return;
+        }
+      }
+      if (pumpkin_pieImage != null && isFoodUnlocked("pumpkin_pie")) {
+        int imgX = rightX, imgY = startY + 7*rowSpacing;
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+          DragItem di = new DragItem(pumpkin_pieImage, imgX, imgY, V_IMG_W, V_IMG_H, "pumpkin_pie");
+          di.offsetX = vx - imgX; di.offsetY = vy - imgY;
+          activeDrags.add(di); currentDrag = di; repaint(); return;
+        }
+      }
+      if (shrimpImage != null && isFoodUnlocked("shrimp")) {
+        int imgX = leftX, imgY = startY + 8*rowSpacing;
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+          DragItem di = new DragItem(shrimpImage, imgX, imgY, V_IMG_W, V_IMG_H, "shrimp");
+          di.offsetX = vx - imgX; di.offsetY = vy - imgY;
+          activeDrags.add(di); currentDrag = di; repaint(); return;
+        }
+      }
+      if (sushiImage != null && isFoodUnlocked("sushi")) {
+        int imgX = rightX, imgY = startY + 8*rowSpacing;
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+          DragItem di = new DragItem(sushiImage, imgX, imgY, V_IMG_W, V_IMG_H, "sushi");
+          di.offsetX = vx - imgX; di.offsetY = vy - imgY;
+          activeDrags.add(di); currentDrag = di; repaint(); return;
+        }
+      }
+      if (tboneImage != null && isFoodUnlocked("t-bone")) {
+        int imgX = leftX, imgY = startY + 9*rowSpacing;
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+          DragItem di = new DragItem(tboneImage, imgX, imgY, V_IMG_W, V_IMG_H, "t-bone");
+          di.offsetX = vx - imgX; di.offsetY = vy - imgY;
+          activeDrags.add(di); currentDrag = di; repaint(); return;
+        }
+      }
+      if (watermelonImage != null && isFoodUnlocked("watermelon")) {
+        int imgX = rightX, imgY = startY + 9*rowSpacing;
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+          DragItem di = new DragItem(watermelonImage, imgX, imgY, V_IMG_W, V_IMG_H, "watermelon");
+          di.offsetX = vx - imgX; di.offsetY = vy - imgY;
+          activeDrags.add(di); currentDrag = di; repaint(); return;
+        }
+      }
       mouseWasPressed = true;
   }
   }
@@ -163,6 +476,55 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
   @Override
   public void mouseReleased(MouseEvent e) {
     mouseWasReleased = true;
+    
+    if (currentDrag != null) {
+      
+      int panelW = getWidth();
+      int panelH = getHeight();
+      double scale = Math.min((double) panelW / VIRTUAL_WIDTH, (double) panelH / VIRTUAL_HEIGHT);
+      int offsetX = (int) Math.round((panelW - VIRTUAL_WIDTH * scale) / 2.0);
+      int offsetY = (int) Math.round((panelH - VIRTUAL_HEIGHT * scale) / 2.0);
+      int vx = (int) Math.round((e.getX() - offsetX) / scale);
+      int vy = (int) Math.round((e.getY() - offsetY) / scale);
+      
+      
+      int cloudX = 1300 + uiShiftX;
+      int cloudY = 460 + uiShiftY;
+      int cloudW = 100, cloudH = 100;
+      
+      
+      if (vx >= cloudX && vx <= cloudX + cloudW && vy >= cloudY && vy <= cloudY + cloudH) {
+        
+        if (currentDrag.key != null && currentDrag.key.equals(cloudFoodKey)) {
+          int price = getPriceForKey(currentDrag.key);
+          moneyAmount += price;
+          
+          try {
+            java.util.List<String> unlocked = FoodEach.allUnlockedFood;
+            if (unlocked != null && !unlocked.isEmpty()) {
+              String newKey = unlocked.get(rand.nextInt(unlocked.size()));
+              cloudFoodKey = newKey;
+              Imagesfood f = new Imagesfood(newKey);
+              BufferedImage bi = f.getImage();
+              if (bi != null) {
+                cloudApple = f;
+                cloudAppleImage = bi;
+                showCloudApple = true;
+              }
+            }
+          } catch (Throwable t) {
+            
+          }
+        }
+        
+        activeDrags.remove(currentDrag);
+      } else {
+        
+        activeDrags.remove(currentDrag);
+      }
+      currentDrag = null;
+    }
+    repaint();
   }
 
   @Override
@@ -234,12 +596,200 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
   private Imagesfood cursor;
   private BufferedImage customer2Image = null;
   private Imagesfood customer2;
+  
+  private double customer2Vx = 1484; 
+  private double customer2Vy = 961;  
+  
+  private int customer2State = 0;
+  private long lastUpdateMillis = System.currentTimeMillis();
+  
+  private double customer2Speed = 80.0; 
+  
+  private int customer2ApproachOffsetY = 120; 
+  private int customer2FinalOffsetBelow = 65;  
+  
+  private long customer2SpawnTimeMillis = 0L;
+  private int customer2StartDelayMs = 3000; 
+  
+  private boolean customer2Visible = false;
+  
+  private int customer2PauseAfterVerticalMs = 2000; 
+  private long customer2VerticalMovementStart = 0L;
+  private long customer2VerticalMovementAccum = 0L;
+  private boolean customer2AnimationPaused = false;
+  private int customer2PausedFrameIndex = -1;
+  
+  
+  
+  
+  private double customer2SpawnPercentX = 0.70; 
+  private double customer2SpawnPercentY = 0.9; 
+  private double customer2SpawnOffsetX = 0.0;  
+  private double customer2SpawnOffsetY = 0.0;  
+  
+  private double customer2InitialVx = 0.0;
+  
+  private double customer2HorizontalFraction = 0.3; 
+  
+  
+  private java.util.List<BufferedImage> customer2FramesOriginal = new java.util.ArrayList<>();
+  
+  private java.util.List<BufferedImage> customer2FramesScaled = new java.util.ArrayList<>();
+  private int customer2FrameIndex = 0;
+  
+  private long customer2AnimStartMillis = 0L;
+  private int customer2FrameDurationMs = 60; 
+  
+  private int lastCustomer2ScaledW = -1;
+  private int lastCustomer2ScaledH = -1;
   private BufferedImage cloudImage = null;
   private Imagesfood cloud;
   
   private BufferedImage cloudAppleImage = null;
   private Imagesfood cloudApple;
+  private String cloudFoodKey = null;  
   private boolean showCloudApple = false;
+  private final java.util.Random rand = new java.util.Random();
+
+  
+  public void onCorrectAnswer() {
+    
+    pointAmount += 1;
+    
+    try {
+      java.util.List<String> unlocked = FoodEach.allUnlockedFood;
+      if (unlocked != null && !unlocked.isEmpty()) {
+        String key = unlocked.get(rand.nextInt(unlocked.size()));
+        cloudFoodKey = key;  
+        Imagesfood f = new Imagesfood(key);
+        BufferedImage bi = f.getImage();
+        if (bi != null) {
+          cloudApple = f;
+          cloudAppleImage = bi;
+          showCloudApple = true;
+        }
+      }
+    } catch (Throwable t) {
+      
+    }
+    repaint();
+  }
+
+  
+  private final java.util.Map<BufferedImage, BufferedImage> grayscaleCache = new java.util.HashMap<>();
+
+  
+  private BufferedImage toGray(BufferedImage src) {
+    if (src == null) return null;
+    BufferedImage cached = grayscaleCache.get(src);
+    if (cached != null) return cached;
+    int w = src.getWidth();
+    int h = src.getHeight();
+    BufferedImage gray = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+    for (int y = 0; y < h; y++) {
+      for (int x = 0; x < w; x++) {
+        int argb = src.getRGB(x, y);
+        int a = (argb >> 24) & 0xff;
+        int r = (argb >> 16) & 0xff;
+        int g = (argb >> 8) & 0xff;
+        int b = argb & 0xff;
+        int lum = (int) Math.round(0.2126 * r + 0.7152 * g + 0.0722 * b);
+        int grayPixel = (a << 24) | (lum << 16) | (lum << 8) | lum;
+        gray.setRGB(x, y, grayPixel);
+      }
+    }
+    grayscaleCache.put(src, gray);
+    return gray;
+  }
+
+  
+  private BufferedImage getImageForKey(BufferedImage img, String key) {
+    if (img == null) return null;
+    try {
+      if (FoodEach.allUnlockedFood.contains(key)) return img;
+    } catch (Throwable t) {
+      
+      return img;
+    }
+    return toGray(img);
+  }
+
+  
+  private int getPriceForKey(String key) {
+    try {
+      FoodEach fe = FoodEach.getByName(key);
+      if (fe != null) return fe.getPrice();
+    } catch (Throwable t) {
+      
+    }
+    return 0;
+  }
+
+  
+  private boolean isFoodUnlocked(String key) {
+    try {
+      return FoodEach.allUnlockedFood.contains(key);
+    } catch (Throwable t) {
+      return false;
+    }
+  }
+
+  
+  private int getUnlockCostForKey(String key) {
+    try {
+      FoodEach fe = FoodEach.getByName(key);
+      if (fe != null) return fe.getReqMoney();
+    } catch (Throwable t) {
+      
+    }
+    return 0;
+  }
+
+  
+  private void attemptUnlock(String key) {
+    try {
+      FoodEach fe = FoodEach.getByName(key);
+      if (fe != null) {
+        int cost = fe.getReqMoney();
+        if (moneyAmount >= cost) {
+          
+          if (fe.unlock(moneyAmount)) {
+            
+            moneyAmount -= cost;
+            repaint();
+          }
+        }
+      }
+    } catch (Throwable t) {
+      
+    }
+  }
+
+  
+  private void removeInventoryImageForKey(String key) {
+    switch (key) {
+      case "apple": appleImage = null; break;
+      case "apple_pie": apple_pieImage = null; break;
+      case "avocado": avocadoImage = null; break;
+      case "boar_head": boar_headImage = null; break;
+      case "bread": breadImage = null; break;
+      case "cheese": cheeseImage = null; break;
+      case "cheesecake": cheesecakeImage = null; break;
+      case "chicken": chickenImage = null; break;
+      case "cookie": cookieImage = null; break;
+      case "dragon_fruit": dragon_fruitImage = null; break;
+      case "fish": fishImage = null; break;
+      case "fried_eggs": fried_eggsImage = null; break;
+      case "honey": honeyImage = null; break;
+      case "pineapple": pineappleImage = null; break;
+      case "pretzel": pretzelImage = null; break;
+      case "pumpkin_pie": pumpkin_pieImage = null; break;
+      case "shrimp": shrimpImage = null; break;
+      case "sushi": sushiImage = null; break;
+      case "t-bone": tboneImage = null; break;
+      case "watermelon": watermelonImage = null; break;
+    }
+  }
 
   private BufferedImage questionImage = null;
   private Imagesfood question;
@@ -249,12 +799,16 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
   private BufferedImage pointImage = null;
   private Imagesfood point;
   
+  private int moneyAmount = 0;
+  private int pointAmount = 0;
+  
   private static class DragItem {
     BufferedImage img;
     int vx, vy, vW, vH;
     int offsetX, offsetY;
-    DragItem(BufferedImage img, int vx, int vy, int vW, int vH) {
-      this.img = img; this.vx = vx; this.vy = vy; this.vW = vW; this.vH = vH; this.offsetX = 0; this.offsetY = 0;
+    String key;  
+    DragItem(BufferedImage img, int vx, int vy, int vW, int vH, String key) {
+      this.img = img; this.vx = vx; this.vy = vy; this.vW = vW; this.vH = vH; this.offsetX = 0; this.offsetY = 0; this.key = key;
     }
   }
   private final java.util.List<DragItem> activeDrags = new java.util.ArrayList<>();
@@ -343,80 +897,88 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       int row = 0;
       int imgX = leftX;
       int imgY = startY + row * rowSpacing;
-      drawVirtualImage(g, appleImage, imgX, imgY, V_IMG_W, V_IMG_H);
-      drawVirtualString(g, "Apple", imgX + V_IMG_W + 8, imgY + 30);
+      drawVirtualImage(g, getImageForKey(appleImage, "apple"), imgX, imgY, V_IMG_W, V_IMG_H);
+      if (isFoodUnlocked("apple")) {
+        drawVirtualString(g, "Apple - " + getPriceForKey("apple"), imgX + V_IMG_W + 8, imgY + 30);
+      } else {
+        drawVirtualString(g, "Unlock: " + getUnlockCostForKey("apple"), imgX + V_IMG_W + 8, imgY + 30);
+      }
     }
     if (apple_pieImage != null)
     {
       int row = 0;
       int imgX = rightX;
       int imgY = startY + row * rowSpacing;
-      drawVirtualImage(g, apple_pieImage, imgX, imgY, V_IMG_W, V_IMG_H);
-      drawVirtualString(g, "Apple Pie", imgX + V_IMG_W + 8, imgY + 35);
+      drawVirtualImage(g, getImageForKey(apple_pieImage, "apple_pie"), imgX, imgY, V_IMG_W, V_IMG_H);
+      if (isFoodUnlocked("apple_pie")) {
+        drawVirtualString(g, "Apple Pie - " + getPriceForKey("apple_pie"), imgX + V_IMG_W + 8, imgY + 35);
+      } else {
+        drawVirtualString(g, "Unlock: " + getUnlockCostForKey("apple_pie"), imgX + V_IMG_W + 8, imgY + 35);
+      }
     }
     if (avocadoImage != null)
     {
       int row = 1;
       int imgX = leftX;
       int imgY = startY + row * rowSpacing;
-      drawVirtualImage(g, avocadoImage, imgX, imgY, V_IMG_W, V_IMG_H);
-      drawVirtualString(g, "Avocado", imgX + V_IMG_W + 8, imgY + 35);
+      drawVirtualImage(g, getImageForKey(avocadoImage, "avocado"), imgX, imgY, V_IMG_W, V_IMG_H);
+      drawVirtualString(g, "Avocado - " + getPriceForKey("avocado"), imgX + V_IMG_W + 8, imgY + 35);
     }
     if (boar_headImage != null)
     {
       int row = 1;
       int imgX = rightX;
       int imgY = startY + row * rowSpacing;
-      drawVirtualImage(g, boar_headImage, imgX, imgY, V_IMG_W, V_IMG_H);
-      drawVirtualString(g, "Boar Head", imgX + V_IMG_W + 8, imgY + 35);
+      drawVirtualImage(g, getImageForKey(boar_headImage, "boar_head"), imgX, imgY, V_IMG_W, V_IMG_H);
+      drawVirtualString(g, "Boar Head - " + getPriceForKey("boar_head"), imgX + V_IMG_W + 8, imgY + 35);
     }
     if (breadImage != null)
     {
       int row = 2;
       int imgX = leftX;
       int imgY = startY + row * rowSpacing;
-      drawVirtualImage(g, breadImage, imgX, imgY, V_IMG_W, V_IMG_H);
-      drawVirtualString(g, "Bread", imgX + V_IMG_W + 8, imgY + 35);
+      drawVirtualImage(g, getImageForKey(breadImage, "bread"), imgX, imgY, V_IMG_W, V_IMG_H);
+      drawVirtualString(g, "Bread - " + getPriceForKey("bread"), imgX + V_IMG_W + 8, imgY + 35);
     }
     if (cheeseImage != null)
     {
       int row = 2;
       int imgX = rightX;
       int imgY = startY + row * rowSpacing;
-      drawVirtualImage(g, cheeseImage, imgX, imgY, V_IMG_W, V_IMG_H);
-      drawVirtualString(g, "Cheese", imgX + V_IMG_W + 8, imgY + 35);
+      drawVirtualImage(g, getImageForKey(cheeseImage, "cheese"), imgX, imgY, V_IMG_W, V_IMG_H);
+      drawVirtualString(g, "Cheese - " + getPriceForKey("cheese"), imgX + V_IMG_W + 8, imgY + 35);
     }
     if (cheesecakeImage != null)
     {
       int row = 3;
       int imgX = leftX;
       int imgY = startY + row * rowSpacing;
-      drawVirtualImage(g, cheesecakeImage, imgX, imgY, V_IMG_W, V_IMG_H);
-      drawVirtualString(g, "Cheesecake", imgX + V_IMG_W + 8, imgY + 35);
+      drawVirtualImage(g, getImageForKey(cheesecakeImage, "cheesecake"), imgX, imgY, V_IMG_W, V_IMG_H);
+      drawVirtualString(g, "Cheesecake - " + getPriceForKey("cheesecake"), imgX + V_IMG_W + 8, imgY + 35);
     }
     if (chickenImage != null)
     {
       int row = 3;
       int imgX = rightX;
       int imgY = startY + row * rowSpacing;
-      drawVirtualImage(g, chickenImage, imgX, imgY, V_IMG_W, V_IMG_H);
-      drawVirtualString(g, "Chicken", imgX + V_IMG_W + 8, imgY + 35);
+      drawVirtualImage(g, getImageForKey(chickenImage, "chicken"), imgX, imgY, V_IMG_W, V_IMG_H);
+      drawVirtualString(g, "Chicken - " + getPriceForKey("chicken"), imgX + V_IMG_W + 8, imgY + 35);
     }
     if (cookieImage != null)
     {
       int row = 4;
       int imgX = leftX;
       int imgY = startY + row * rowSpacing;
-      drawVirtualImage(g, cookieImage, imgX, imgY, V_IMG_W, V_IMG_H);
-      drawVirtualString(g, "Cookie", imgX + V_IMG_W + 8, imgY + 35);
+      drawVirtualImage(g, getImageForKey(cookieImage, "cookie"), imgX, imgY, V_IMG_W, V_IMG_H);
+      drawVirtualString(g, "Cookie - " + getPriceForKey("cookie"), imgX + V_IMG_W + 8, imgY + 35);
     }
     if (dragon_fruitImage != null)
     {
       int row = 4;
       int imgX = rightX;
       int imgY = startY + row * rowSpacing;
-      drawVirtualImage(g, dragon_fruitImage, imgX, imgY, V_IMG_W, V_IMG_H);
-      drawVirtualString(g, "Dragon Fruit", imgX + V_IMG_W + 8, imgY + 35);
+      drawVirtualImage(g, getImageForKey(dragon_fruitImage, "dragon_fruit"), imgX, imgY, V_IMG_W, V_IMG_H);
+      drawVirtualString(g, "Dragon Fruit - " + getPriceForKey("dragon_fruit"), imgX + V_IMG_W + 8, imgY + 35);
     }
 
     if (fishImage != null)
@@ -424,8 +986,8 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       int row = 5;
       int imgX = leftX;
       int imgY = startY + row * rowSpacing;
-      drawVirtualImage(g, fishImage, imgX, imgY, V_IMG_W, V_IMG_H);
-      drawVirtualString(g, "Fish", imgX + V_IMG_W + 8, imgY + 35);
+      drawVirtualImage(g, getImageForKey(fishImage, "fish"), imgX, imgY, V_IMG_W, V_IMG_H);
+      drawVirtualString(g, "Fish - " + getPriceForKey("fish"), imgX + V_IMG_W + 8, imgY + 35);
     }
 
     if (fried_eggsImage != null)
@@ -433,8 +995,8 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       int row = 5;
       int imgX = rightX;
       int imgY = startY + row * rowSpacing;
-      drawVirtualImage(g, fried_eggsImage, imgX, imgY, V_IMG_W, V_IMG_H);
-      drawVirtualString(g, "Fried Eggs", imgX + V_IMG_W + 8, imgY + 35);
+      drawVirtualImage(g, getImageForKey(fried_eggsImage, "fried_eggs"), imgX, imgY, V_IMG_W, V_IMG_H);
+      drawVirtualString(g, "Fried Eggs - " + getPriceForKey("fried_eggs"), imgX + V_IMG_W + 8, imgY + 35);
     }
 
     if (honeyImage != null)
@@ -442,8 +1004,8 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       int row = 6;
       int imgX = leftX;
       int imgY = startY + row * rowSpacing;
-      drawVirtualImage(g, honeyImage, imgX, imgY, V_IMG_W, V_IMG_H);
-      drawVirtualString(g, "Honey", imgX + V_IMG_W + 8, imgY + 35);
+      drawVirtualImage(g, getImageForKey(honeyImage, "honey"), imgX, imgY, V_IMG_W, V_IMG_H);
+      drawVirtualString(g, "Honey - " + getPriceForKey("honey"), imgX + V_IMG_W + 8, imgY + 35);
     }
 
     if (pineappleImage != null)
@@ -451,8 +1013,8 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       int row = 6;
       int imgX = rightX;
       int imgY = startY + row * rowSpacing;
-      drawVirtualImage(g, pineappleImage, imgX, imgY, V_IMG_W, V_IMG_H);
-      drawVirtualString(g, "Pineapple", imgX + V_IMG_W + 8, imgY + 35);
+      drawVirtualImage(g, getImageForKey(pineappleImage, "pineapple"), imgX, imgY, V_IMG_W, V_IMG_H);
+      drawVirtualString(g, "Pineapple - " + getPriceForKey("pineapple"), imgX + V_IMG_W + 8, imgY + 35);
     }
 
     if (pretzelImage != null)
@@ -460,8 +1022,8 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       int row = 7;
       int imgX = leftX;
       int imgY = startY + row * rowSpacing;
-      drawVirtualImage(g, pretzelImage, imgX, imgY, V_IMG_W, V_IMG_H);
-      drawVirtualString(g, "Pretzel", imgX + V_IMG_W + 8, imgY + 35);
+      drawVirtualImage(g, getImageForKey(pretzelImage, "pretzel"), imgX, imgY, V_IMG_W, V_IMG_H);
+      drawVirtualString(g, "Pretzel - " + getPriceForKey("pretzel"), imgX + V_IMG_W + 8, imgY + 35);
     }
 
     if (pumpkin_pieImage != null)
@@ -469,8 +1031,8 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       int row = 7;
       int imgX = rightX;
       int imgY = startY + row * rowSpacing;
-      drawVirtualImage(g, pumpkin_pieImage, imgX, imgY, V_IMG_W, V_IMG_H);
-      drawVirtualString(g, "Pumpkin Pie", imgX + V_IMG_W + 8, imgY + 35);
+      drawVirtualImage(g, getImageForKey(pumpkin_pieImage, "pumpkin_pie"), imgX, imgY, V_IMG_W, V_IMG_H);
+      drawVirtualString(g, "Pumpkin Pie - " + getPriceForKey("pumpkin_pie"), imgX + V_IMG_W + 8, imgY + 35);
     }
 
     if (shrimpImage != null)
@@ -478,8 +1040,8 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       int row = 8;
       int imgX = leftX;
       int imgY = startY + row * rowSpacing;
-      drawVirtualImage(g, shrimpImage, imgX, imgY, V_IMG_W, V_IMG_H);
-      drawVirtualString(g, "Shrimp", imgX + V_IMG_W + 8, imgY + 35);
+      drawVirtualImage(g, getImageForKey(shrimpImage, "shrimp"), imgX, imgY, V_IMG_W, V_IMG_H);
+      drawVirtualString(g, "Shrimp - " + getPriceForKey("shrimp"), imgX + V_IMG_W + 8, imgY + 35);
     }
     
     if (sushiImage != null)
@@ -487,8 +1049,8 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       int row = 8;
       int imgX = rightX;
       int imgY = startY + row * rowSpacing;
-      drawVirtualImage(g, sushiImage, imgX, imgY, V_IMG_W, V_IMG_H);
-      drawVirtualString(g, "Sushi", imgX + V_IMG_W + 8, imgY + 35);
+      drawVirtualImage(g, getImageForKey(sushiImage, "sushi"), imgX, imgY, V_IMG_W, V_IMG_H);
+      drawVirtualString(g, "Sushi - " + getPriceForKey("sushi"), imgX + V_IMG_W + 8, imgY + 35);
     }
 
     if (tboneImage != null)
@@ -496,8 +1058,8 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       int row = 9;
       int imgX = leftX;
       int imgY = startY + row * rowSpacing;
-      drawVirtualImage(g, tboneImage, imgX, imgY, V_IMG_W, V_IMG_H);
-      drawVirtualString(g, "T-Bone", imgX + V_IMG_W + 8, imgY + 35);
+      drawVirtualImage(g, getImageForKey(tboneImage, "t-bone"), imgX, imgY, V_IMG_W, V_IMG_H);
+      drawVirtualString(g, "T-Bone - " + getPriceForKey("t-bone"), imgX + V_IMG_W + 8, imgY + 35);
     }
     
     if (watermelonImage != null)
@@ -505,8 +1067,8 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       int row = 9;
       int imgX = rightX;
       int imgY = startY + row * rowSpacing;
-      drawVirtualImage(g, watermelonImage, imgX, imgY, V_IMG_W, V_IMG_H);
-      drawVirtualString(g, "Watermelon", imgX + V_IMG_W + 8, imgY + 35);
+      drawVirtualImage(g, getImageForKey(watermelonImage, "watermelon"), imgX, imgY, V_IMG_W, V_IMG_H);
+      drawVirtualString(g, "Watermelon - " + getPriceForKey("watermelon"), imgX + V_IMG_W + 8, imgY + 35);
     }
     }
 
@@ -522,39 +1084,96 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
     if (shoppingcartImage != null)
     {
       
-      drawVirtualImage(g, shoppingcartImage, 50 + uiShiftX, 70 + uiShiftY, 60, 60);
+      drawVirtualImage(g, shoppingcartImage, 50 + uiShiftX, 97 + uiShiftY, 60, 60);
     }
-    if (customer2Image != null)
+    if (customer2Image != null && customer2Visible)
     {
       
-      drawVirtualImage(g, customer2Image, 750 + uiShiftX, 400 + uiShiftY, 250, 250);
+      final int V_W = 250;
+      final int V_H = 250;
+      
+      if (customer2State == 2) {
+        drawVirtualImage(g, customer2Image, (int)Math.round(customer2Vx), (int)Math.round(customer2Vy), V_W, V_H);
+        
+        
+      } else {
+      
+      
+      int aw = Math.max(1, (int) Math.round(V_W * scale));
+      int ah = Math.max(1, (int) Math.round(V_H * scale));
+
+      BufferedImage frameToDraw = null;
+      if (!customer2FramesOriginal.isEmpty()) {
+        
+        if (customer2FramesScaled.size() != customer2FramesOriginal.size() || lastCustomer2ScaledW != aw || lastCustomer2ScaledH != ah) {
+          customer2FramesScaled.clear();
+          for (BufferedImage orig : customer2FramesOriginal) {
+            BufferedImage scaled = getScaledImage(orig, aw, ah);
+            customer2FramesScaled.add(scaled);
+          }
+          lastCustomer2ScaledW = aw;
+          lastCustomer2ScaledH = ah;
+        }
+
+        if (!customer2FramesScaled.isEmpty()) {
+          long now = System.currentTimeMillis();
+          if (customer2AnimationPaused && customer2PausedFrameIndex >= 0) {
+            int safe = Math.max(0, Math.min(customer2PausedFrameIndex, customer2FramesScaled.size()-1));
+            frameToDraw = customer2FramesScaled.get(safe);
+          } else {
+            long elapsed = now - customer2AnimStartMillis;
+            if (customer2AnimStartMillis == 0L) elapsed = 0;
+            int idx = (int) ((elapsed / Math.max(1, customer2FrameDurationMs)) % customer2FramesScaled.size());
+            frameToDraw = customer2FramesScaled.get(idx);
+          }
+        }
+      }
+
+        
+        if (frameToDraw == null) {
+          drawVirtualImage(g, customer2Image, 750 + uiShiftX, 400 + uiShiftY, V_W, V_H);
+        } else {
+          
+          int offsetX_local = (int) Math.round((panelW - VIRTUAL_WIDTH * scale) / 2.0);
+          int offsetY_local = (int) Math.round((panelH - VIRTUAL_HEIGHT * scale) / 2.0);
+          int ax = offsetX_local + (int) Math.round(customer2Vx * scale);
+          int ay = offsetY_local + (int) Math.round(customer2Vy * scale);
+          g.drawImage(frameToDraw, ax, ay, aw, ah, this);
+        }
+      }
+    } else {
+      
     }
     if (cloudImage != null)
     {
       
-      drawVirtualImage(g, cloudImage, 900 + uiShiftX, 450 + uiShiftY, 100, 100);
+      drawVirtualImage(g, cloudImage, 1300 + uiShiftX, 460 + uiShiftY, 100, 100);
     }
     if (cloudAppleImage != null)
     {
       
-      drawVirtualImage(g, cloudAppleImage, 933 + uiShiftX, 490 + uiShiftY, 30, 30);
+      drawVirtualImage(g, cloudAppleImage, 1336 + uiShiftX, 500 + uiShiftY, 30, 30);
     }
 
     if (questionImage != null)
     {
       
-      drawVirtualImage(g, questionImage, 800, 80, 150, 150);
+      drawVirtualImage(g, questionImage, 800, 75, 150, 150);
     }
 
     if (pointImage != null)
     {
       
-      drawVirtualImage(g, pointImage, 250, 60, 250, 100);
+      drawVirtualImage(g, pointImage, 250, 25, 250, 100);
+      
+      drawVirtualString(g, Integer.toString(pointAmount), 390, 94);
     }
     if (moneyImage != null)
     {
       
-      drawVirtualImage(g, moneyImage, 480, 60, 250, 100);
+      drawVirtualImage(g, moneyImage, 480, 25, 250, 100);
+      
+      drawVirtualString(g, Integer.toString(moneyAmount), 610, 97);
     }
 
     
@@ -562,6 +1181,27 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       for (DragItem d : activeDrags) {
         if (d != null && d.img != null) drawVirtualImage(g, d.img, d.vx, d.vy, d.vW, d.vH);
       }
+    }
+
+    
+    try {
+      Graphics2D g2coords = (Graphics2D) g;
+      Font oldF = g2coords.getFont();
+      Color oldC = g2coords.getColor();
+      
+      Font small = oldF.deriveFont(12f);
+      g2coords.setFont(small);
+      String coords = "x:" + mouseX + " y:" + mouseY;
+      
+      g2coords.setColor(Color.BLACK);
+      g2coords.drawString(coords, 11, 19);
+      
+      g2coords.setColor(Color.WHITE);
+      g2coords.drawString(coords, 10, 18);
+      g2coords.setFont(oldF);
+      g2coords.setColor(oldC);
+    } catch (Throwable t) {
+      
     }
 
     
@@ -682,7 +1322,11 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
         SwingUtilities.invokeLater(() -> {
             JFrame frame = new JFrame("Red Window with Cursor Circle");
             Main panel = new Main();
+              mainInstance = panel;
             frame.add(panel);
+
+            
+            new Driver();
 
             panel.store = new Imagesfood("store");
             panel.storeImageOriginal = panel.store.getImage();
@@ -747,17 +1391,9 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
             panel.money = new Imagesfood("money");
             panel.moneyImage = panel.money.getImage();
 
-            JLabel pointLable = new JLabel();
-            pointLable.setBounds(390, 124, 500, 100); 
-            pointLable.setFont(new Font("Arial", Font.BOLD, 40));
-            pointLable.setText(100 + "");
-            panel.add(pointLable);
-
-            JLabel moneyLable = new JLabel();
-            moneyLable.setBounds(610, 127, 250, 100); 
-            moneyLable.setFont(new Font("Arial", Font.BOLD, 40));
-            moneyLable.setText(500 + "");
-            panel.add(moneyLable);
+            
+            panel.pointAmount = 0;
+            panel.moneyAmount = 0;
 
             
 
@@ -786,218 +1422,66 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
             System.out.println("watermelon=" + (panel.watermelonImage != null));
             System.out.println("man_idle=" + (panel.man_idleImage != null));
           
+                
+                panel.customer2 = new Imagesfood("customer2_idle/1");
+                panel.customer2Image = panel.customer2.getImage();
+                
+                
+                panel.customer2Vx = panel.customer2SpawnPercentX * VIRTUAL_WIDTH + panel.customer2SpawnOffsetX;
+                panel.customer2Vy = panel.customer2SpawnPercentY * VIRTUAL_HEIGHT + panel.customer2SpawnOffsetY;
+                
+                panel.customer2InitialVx = panel.customer2Vx;
+                panel.customer2State = 0;
+                long now = System.currentTimeMillis();
+                panel.lastUpdateMillis = now;
+                panel.customer2SpawnTimeMillis = now; 
+                
+                panel.cloud = new Imagesfood("cloud");
+                panel.cloudImage = panel.cloud.getImage();
+                panel.cloudApple = new Imagesfood("apple");
+                panel.cloudAppleImage = panel.cloudApple.getImage();
+                panel.showCloudApple = (panel.cloudAppleImage != null);
+
+                  
+                  new Thread(() -> {
+                    java.util.List<BufferedImage> loaded = new java.util.ArrayList<>();
+                    for (int i = 1; i <= 10; i++) {
+                      Imagesfood f = new Imagesfood("customer2_walking/" + i);
+                      BufferedImage bi = f.getImage();
+                      if (bi != null) loaded.add(bi);
+                    }
+                    if (!loaded.isEmpty()) {
+                      
+                      SwingUtilities.invokeLater(() -> {
+                        panel.customer2FramesOriginal.clear();
+                        panel.customer2FramesOriginal.addAll(loaded);
+                        
+                        panel.customer2FramesScaled.clear();
+                        panel.lastCustomer2ScaledW = -1;
+                        panel.lastCustomer2ScaledH = -1;
+                        panel.customer2AnimStartMillis = System.currentTimeMillis();
+                        System.out.println("Loaded customer2 frames: " + panel.customer2FramesOriginal.size());
+                        panel.repaint();
+                      });
+                    }
+                  }, "customer2-loader").start();
+
             
-           Timer delayedImageTimer = new Timer(2000, e -> {
-                    panel.customer2 = new Imagesfood("customer2_idle/1");
-                    panel.customer2Image = panel.customer2.getImage();
-                    System.out.println("Delayed customer2 image loaded: " + (panel.customer2Image != null));
-                    panel.cloud = new Imagesfood("cloud");
-                    panel.cloudImage = panel.cloud.getImage(); 
-                    System.out.println("Delayed cloud image loaded: " + (panel.cloudImage != null));
-                  
-                  panel.cloudApple = new Imagesfood("apple");
-                  panel.cloudAppleImage = panel.cloudApple.getImage(); 
-                  panel.showCloudApple = (panel.cloudAppleImage != null);
-                  System.out.println("Delayed cloud-apple image loaded: " + (panel.cloudAppleImage != null));
-                  
-                    panel.repaint();
-              });
-              Timer delayedImageTimer1 = new Timer(2500, e -> {
-                    panel.customer2 = new Imagesfood("customer2_walking/1");
-                    panel.customer2Image = panel.customer2.getImage();
-                    System.out.println("Delayed customer2 image loaded: " + (panel.customer2Image != null));
-                    panel.cloud = new Imagesfood("cloud");
-                    panel.cloudImage = panel.cloud.getImage(); 
-                    System.out.println("Delayed cloud image loaded: " + (panel.cloudImage != null));
-                  
-                  panel.cloudApple = new Imagesfood("apple");
-                  panel.cloudAppleImage = panel.cloudApple.getImage(); 
-                  panel.showCloudApple = (panel.cloudAppleImage != null);
-                  System.out.println("Delayed cloud-apple image loaded: " + (panel.cloudAppleImage != null));
-                  
-                    panel.repaint();
-              });
-              Timer delayedImageTimer2 = new Timer(3000, e -> {
-                    panel.customer2 = new Imagesfood("customer2_walking/2");
-                    panel.customer2Image = panel.customer2.getImage();
-                    System.out.println("Delayed customer2 image loaded: " + (panel.customer2Image != null));
-                    panel.cloud = new Imagesfood("cloud");
-                    panel.cloudImage = panel.cloud.getImage(); 
-                    System.out.println("Delayed cloud image loaded: " + (panel.cloudImage != null));
-                  
-                  panel.cloudApple = new Imagesfood("apple");
-                  panel.cloudAppleImage = panel.cloudApple.getImage(); 
-                  panel.showCloudApple = (panel.cloudAppleImage != null);
-                  System.out.println("Delayed cloud-apple image loaded: " + (panel.cloudAppleImage != null));
-                  
-                    panel.repaint();
-              });
-              Timer delayedImageTimer3 = new Timer(3500, e -> {
-                    panel.customer2 = new Imagesfood("customer2_walking/3");
-                    panel.customer2Image = panel.customer2.getImage();
-                    System.out.println("Delayed customer2 image loaded: " + (panel.customer2Image != null));
-                    panel.cloud = new Imagesfood("cloud");
-                    panel.cloudImage = panel.cloud.getImage(); 
-                    System.out.println("Delayed cloud image loaded: " + (panel.cloudImage != null));
-                  
-                  panel.cloudApple = new Imagesfood("apple");
-                  panel.cloudAppleImage = panel.cloudApple.getImage(); 
-                  panel.showCloudApple = (panel.cloudAppleImage != null);
-                  System.out.println("Delayed cloud-apple image loaded: " + (panel.cloudAppleImage != null));
-                  
-              });
-              Timer delayedImageTimer4 = new Timer(4000, e -> {
-                    panel.customer2 = new Imagesfood("customer2_walking/4");
-                    panel.customer2Image = panel.customer2.getImage();
-                    System.out.println("Delayed customer2 image loaded: " + (panel.customer2Image != null));
-                    panel.cloud = new Imagesfood("cloud");
-                    panel.cloudImage = panel.cloud.getImage(); 
-                    System.out.println("Delayed cloud image loaded: " + (panel.cloudImage != null));
-                  
-                  panel.cloudApple = new Imagesfood("apple");
-                  panel.cloudAppleImage = panel.cloudApple.getImage(); 
-                  panel.showCloudApple = (panel.cloudAppleImage != null);
-                  System.out.println("Delayed cloud-apple image loaded: " + (panel.cloudAppleImage != null));
-                  
-                    panel.repaint();
-              });
-              Timer delayedImageTimer5 = new Timer(4500, e -> {
-                    panel.customer2 = new Imagesfood("customer2_walking/5");
-                    panel.customer2Image = panel.customer2.getImage();
-                    System.out.println("Delayed customer2 image loaded: " + (panel.customer2Image != null));
-                    panel.cloud = new Imagesfood("cloud");
-                    panel.cloudImage = panel.cloud.getImage(); 
-                    System.out.println("Delayed cloud image loaded: " + (panel.cloudImage != null));
-                  
-                  panel.cloudApple = new Imagesfood("apple");
-                  panel.cloudAppleImage = panel.cloudApple.getImage(); 
-                  panel.showCloudApple = (panel.cloudAppleImage != null);
-                  System.out.println("Delayed cloud-apple image loaded: " + (panel.cloudAppleImage != null));
-                  
-                    panel.repaint();
-              });
-              Timer delayedImageTimer6 = new Timer(5000, e -> {
-                    panel.customer2 = new Imagesfood("customer2_walking/6");
-                    panel.customer2Image = panel.customer2.getImage();
-                    System.out.println("Delayed customer2 image loaded: " + (panel.customer2Image != null));
-                    panel.cloud = new Imagesfood("cloud");
-                    panel.cloudImage = panel.cloud.getImage(); 
-                    System.out.println("Delayed cloud image loaded: " + (panel.cloudImage != null));
-                  
-                  panel.cloudApple = new Imagesfood("apple");
-                  panel.cloudAppleImage = panel.cloudApple.getImage(); 
-                  panel.showCloudApple = (panel.cloudAppleImage != null);
-                  System.out.println("Delayed cloud-apple image loaded: " + (panel.cloudAppleImage != null));
-                  
-                    panel.repaint();
-              });
-              Timer delayedImageTimer7 = new Timer(5500, e -> {
-                    panel.customer2 = new Imagesfood("customer2_walking/7");
-                    panel.customer2Image = panel.customer2.getImage();
-                    System.out.println("Delayed customer2 image loaded: " + (panel.customer2Image != null));
-                    panel.cloud = new Imagesfood("cloud");
-                    panel.cloudImage = panel.cloud.getImage(); 
-                    System.out.println("Delayed cloud image loaded: " + (panel.cloudImage != null));
-                  
-                  panel.cloudApple = new Imagesfood("apple");
-                  panel.cloudAppleImage = panel.cloudApple.getImage(); 
-                  panel.showCloudApple = (panel.cloudAppleImage != null);
-                  System.out.println("Delayed cloud-apple image loaded: " + (panel.cloudAppleImage != null));
-                  
-              });
-              Timer delayedImageTimer8 = new Timer(6000, e -> {
-                    panel.customer2 = new Imagesfood("customer2_walking/8");
-                    panel.customer2Image = panel.customer2.getImage();
-                    System.out.println("Delayed customer2 image loaded: " + (panel.customer2Image != null));
-                    panel.cloud = new Imagesfood("cloud");
-                    panel.cloudImage = panel.cloud.getImage(); 
-                    System.out.println("Delayed cloud image loaded: " + (panel.cloudImage != null));
-                  
-                  panel.cloudApple = new Imagesfood("apple");
-                  panel.cloudAppleImage = panel.cloudApple.getImage(); 
-                  panel.showCloudApple = (panel.cloudAppleImage != null);
-                  System.out.println("Delayed cloud-apple image loaded: " + (panel.cloudAppleImage != null));
-                  
-              });
-              Timer delayedImageTimer9 = new Timer(6500, e -> {
-                    panel.customer2 = new Imagesfood("customer2_walking/9");
-                    panel.customer2Image = panel.customer2.getImage();
-                    System.out.println("Delayed customer2 image loaded: " + (panel.customer2Image != null));
-                    panel.cloud = new Imagesfood("cloud");
-                    panel.cloudImage = panel.cloud.getImage(); 
-                    System.out.println("Delayed cloud image loaded: " + (panel.cloudImage != null));
-                  
-                  panel.cloudApple = new Imagesfood("apple");
-                  panel.cloudAppleImage = panel.cloudApple.getImage(); 
-                  panel.showCloudApple = (panel.cloudAppleImage != null);
-                  System.out.println("Delayed cloud-apple image loaded: " + (panel.cloudAppleImage != null));
-                  
-              });
-              Timer delayedImageTimer10 = new Timer(7000, e -> {
-                    panel.customer2 = new Imagesfood("customer2_walking/10");
-                    panel.customer2Image = panel.customer2.getImage();
-                    System.out.println("Delayed customer2 image loaded: " + (panel.customer2Image != null));
-                    panel.cloud = new Imagesfood("cloud");
-                    panel.cloudImage = panel.cloud.getImage(); 
-                    System.out.println("Delayed cloud image loaded: " + (panel.cloudImage != null));
-                  
-                  panel.cloudApple = new Imagesfood("apple");
-                  panel.cloudAppleImage = panel.cloudApple.getImage(); 
-                  panel.showCloudApple = (panel.cloudAppleImage != null);
-                  System.out.println("Delayed cloud-apple image loaded: " + (panel.cloudAppleImage != null));
-                  
-              });
-              
-
-              delayedImageTimer.setRepeats(true);
-              
-              delayedImageTimer1.setRepeats(true);
-              
-              delayedImageTimer2.setRepeats(true);
-              //delayedImageTimer2.start();
-              delayedImageTimer3.setRepeats(true);
-              //delayedImageTimer3.start();
-              delayedImageTimer4.setRepeats(true);
-              //delayedImageTimer4.start();
-              delayedImageTimer5.setRepeats(true);
-              //delayedImageTimer5.start();
-              delayedImageTimer6.setRepeats(true);
-              //delayedImageTimer6.start();
-              delayedImageTimer7.setRepeats(true);
-              //delayedImageTimer7.start();
-              delayedImageTimer8.setRepeats(true);
-              //delayedImageTimer8.start();
-              delayedImageTimer9.setRepeats(true);
-              //delayedImageTimer9.start();
-              delayedImageTimer10.setRepeats(true);
-             // delayedImageTimer10.start();
-              delayedImageTimer.start();
-              delayedImageTimer1.start();
-              delayedImageTimer2.start();
-              delayedImageTimer3.start();
-              delayedImageTimer4.start();
-              delayedImageTimer5.start();
-              delayedImageTimer6.start();
-              delayedImageTimer7.start();
-              delayedImageTimer8.start();
-              delayedImageTimer9.start();
-              delayedImageTimer10.start();
-
-            // Create an Imagesfood for the apple and a draggable component
-            // Imagesfood draggableApple = new Imagesfood("apple");
-            // javax.swing.JComponent appleComp = draggableApple.createDraggableComponent(900 + panel.uiShiftX, 450 + panel.uiShiftY);
-            // // Add to the frame's layered pane so it uses absolute positioning and can be dragged
-            // frame.getLayeredPane().add(appleComp, javax.swing.JLayeredPane.DRAG_LAYER);
-            // Imagesfood draggableApple_Pie = new Imagesfood("apple_pie");
-            // javax.swing.JComponent apple_pieComp = draggableApple_Pie.createDraggableComponent(900 + panel.uiShiftX, 450 + panel.uiShiftY);
-            // // Add to the frame's layered pane so it uses absolute positioning and can be dragged
-            // frame.getLayeredPane().add(apple_pieComp, javax.swing.JLayeredPane.DRAG_LAYER);
-            // Imagesfood draggableAvacado = new Imagesfood("avacado");
-            // javax.swing.JComponent avacadoComp = draggableAvacado.createDraggableComponent(900 + panel.uiShiftX, 450 + panel.uiShiftY);
-            // // Add to the frame's layered pane so it uses absolute positioning and can be dragged
-            // frame.getLayeredPane().add(avacadoComp, javax.swing.JLayeredPane.DRAG_LAYER);
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
         });
-        // Repaint happens after image load in the EDT
+        
 
         
 
