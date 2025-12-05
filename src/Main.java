@@ -23,6 +23,8 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
   
   private QuestionPanel questionPanel = null;
   private boolean questionVisible = false;
+
+  private QuestionPanel qp = null;
   
   public Main()
   {
