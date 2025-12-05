@@ -154,7 +154,7 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
         // Toggle the small panel
         qp.toggleQuestionPanel();
     }
-}
+  }
 
   @Override
   public void mousePressed(MouseEvent e)
@@ -798,8 +798,8 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
   private BufferedImage pointImage = null;
   private Imagesfood point;
   
-  private int moneyAmount = 0;
-  private int pointAmount = 0;
+  public static int moneyAmount = 0;
+  public static int pointAmount = 0;
   
   private static class DragItem {
     BufferedImage img;
