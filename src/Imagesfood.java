@@ -6,21 +6,19 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-/**
- * Simple container for named food images.
- */
+
 public class Imagesfood {
     private String name;
     private BufferedImage image;
 
-    /**
-     * Create an Imagesfood by loading from the assets/images folder
-     * using the provided base name (e.g. "apple" -> assets/images/apple.png).
-     */
+    
+     
+     
+     
     public Imagesfood(String imagename) {
         this.name = imagename;
         try {
-            // First try loading from the classpath (works when assets are bundled)
+            
             String resourcePath = "/assets/images/" + imagename + ".png";
             try {
                 java.io.InputStream is = Imagesfood.class.getResourceAsStream(resourcePath);
@@ -30,10 +28,10 @@ public class Imagesfood {
                     return;
                 }
             } catch (Exception e) {
-                // continue to filesystem search on any failure
+                
             }
 
-            // Next, search filesystem starting from user.dir and walking up a few levels
+            
             File imageFile = null;
             File cwd = new File(System.getProperty("user.dir"));
             for (int up = 0; up < 5 && cwd != null; up++) {
@@ -45,7 +43,7 @@ public class Imagesfood {
                 cwd = cwd.getParentFile();
             }
 
-            // If not found yet, do a limited recursive search under user.dir (depth-limited)
+            
             if (imageFile == null) {
                 try {
                     java.nio.file.Path start = new java.io.File(System.getProperty("user.dir")).toPath();
@@ -55,7 +53,7 @@ public class Imagesfood {
                         .findFirst();
                     if (found.isPresent()) imageFile = found.get().toFile();
                 } catch (Exception ex) {
-                    // ignore and fallthrough to not-found handling
+                    
                 }
             }
 
@@ -85,21 +83,7 @@ public class Imagesfood {
         return image;
     }
 
-    /**
-     * Create a Swing component that displays this image and supports
-     * simple mouse dragging. The returned component uses absolute
-     * positioning (its bounds are set to [startX,startY,width,height])
-     * so you should add it to a container that supports absolute layout
-     * (for example a `JLayeredPane` or a container with `null` layout).
-     *
-     * Example:
-     *   JComponent c = img.createDraggableComponent(100, 200);
-     *   layeredPane.add(c, JLayeredPane.DRAG_LAYER);
-     *
-     * @param startX virtual x (pixels) where component will be placed
-     * @param startY virtual y (pixels) where component will be placed
-     * @return a JComponent you can add to your Swing hierarchy
-     */
+    
     public JComponent createDraggableComponent(int startX, int startY) {
         if (image == null) {
             JPanel empty = new JPanel();
@@ -112,7 +96,7 @@ public class Imagesfood {
         return comp;
     }
 
-    // Simple inner component that paints the BufferedImage and allows dragging
+    
     private static class DraggableComponent extends JComponent implements MouseListener, MouseMotionListener {
         private final BufferedImage img;
         private int pressX, pressY;
@@ -143,7 +127,7 @@ public class Imagesfood {
             if (p == null) return;
             int newX = getX() + e.getX() - pressX;
             int newY = getY() + e.getY() - pressY;
-            // keep inside parent bounds
+            
             newX = Math.max(0, Math.min(newX, Math.max(0, p.getWidth() - getWidth())));
             newY = Math.max(0, Math.min(newY, Math.max(0, p.getHeight() - getHeight())));
             setLocation(newX, newY);
