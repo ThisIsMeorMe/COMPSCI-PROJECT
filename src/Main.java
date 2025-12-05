@@ -9,16 +9,16 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
 {
   private boolean mouseWasReleased = false;
   private boolean mouseWasPressed = false;
-  // The variables store coordiates 
+  
   private int mouseX = -10;
   private int mouseY = -10;
   private Timer refreshTimer;
-  // Controls whether the inventory (tan box, outline, food images and text)
+  
   private boolean showInventory = false;
-  // shopping cart, background, outline, and food list by the same amount.
+  
   private int uiShiftX = 70;
   private int uiShiftY = 50;
-  // Question panel and visibility flag
+  
   private QuestionPanel questionPanel = null;
   private boolean questionVisible = false;
   
@@ -42,7 +42,7 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
   public void mouseDragged(MouseEvent e)
   {
     if (currentDrag == null) return;
-    // update current drag position using virtual coordinates
+    
     int panelW = getWidth();
     int panelH = getHeight();
     double scale = Math.min((double) panelW / VIRTUAL_WIDTH, (double) panelH / VIRTUAL_HEIGHT);
@@ -57,7 +57,7 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
 
   @Override
     public void mouseClicked(MouseEvent e) {
-    // Show the question panel when the question image is clicked
+    
     int panelW = getWidth();
     int panelH = getHeight();
     double scale = Math.min((double) panelW / VIRTUAL_WIDTH, (double) panelH / VIRTUAL_HEIGHT);
@@ -70,7 +70,7 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
         questionPanel = new QuestionPanel();
         questionPanel.setBounds(350, 270, 800, 500);
 
-        // Add to the layered pane above everything
+        
         JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
         topFrame.getLayeredPane().add(questionPanel, JLayeredPane.POPUP_LAYER);
     }
@@ -85,7 +85,7 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
   @Override
   public void mousePressed(MouseEvent e)
   {
-    // Convert actual panel coords to virtual coords so hit test matches drawn cart
+    
     int panelW = getWidth();
     int panelH = getHeight();
     double scale = Math.min((double) panelW / VIRTUAL_WIDTH, (double) panelH / VIRTUAL_HEIGHT);
@@ -94,7 +94,7 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
     int vx = (int) Math.round((e.getX() - offsetX) / scale);
     int vy = (int) Math.round((e.getY() - offsetY) / scale);
 
-    // Shopping cart is drawn at base (50,70) shifted by uiShiftX/uiShiftY
+    
     if (vx >= 50 + uiShiftX && vx <= 50 + uiShiftX + 60 && vy >= 70 + uiShiftY && vy <= 70 + uiShiftY + 60) {
       showInventory = !showInventory;
       repaint();
@@ -125,35 +125,35 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
         return false;
       };
 
-      // check items in same order as drawn (two columns)
-      // row 0
+      
+      
       if (tryStart.apply(appleImage, new Point(leftX, startY + 0*rowSpacing))) return;
       if (tryStart.apply(apple_pieImage, new Point(rightX, startY + 0*rowSpacing))) return;
-      // row1
+      
       if (tryStart.apply(avocadoImage, new Point(leftX, startY + 1*rowSpacing))) return;
       if (tryStart.apply(boar_headImage, new Point(rightX, startY + 1*rowSpacing))) return;
-      // row2
+      
       if (tryStart.apply(breadImage, new Point(leftX, startY + 2*rowSpacing))) return;
       if (tryStart.apply(cheeseImage, new Point(rightX, startY + 2*rowSpacing))) return;
-      // row3
+      
       if (tryStart.apply(cheesecakeImage, new Point(leftX, startY + 3*rowSpacing))) return;
       if (tryStart.apply(chickenImage, new Point(rightX, startY + 3*rowSpacing))) return;
-      // row4
+      
       if (tryStart.apply(cookieImage, new Point(leftX, startY + 4*rowSpacing))) return;
       if (tryStart.apply(dragon_fruitImage, new Point(rightX, startY + 4*rowSpacing))) return;
-      // row5
+      
       if (tryStart.apply(fishImage, new Point(leftX, startY + 5*rowSpacing))) return;
       if (tryStart.apply(fried_eggsImage, new Point(rightX, startY + 5*rowSpacing))) return;
-      // row6
+      
       if (tryStart.apply(honeyImage, new Point(leftX, startY + 6*rowSpacing))) return;
       if (tryStart.apply(pineappleImage, new Point(rightX, startY + 6*rowSpacing))) return;
-      // row7
+      
       if (tryStart.apply(pretzelImage, new Point(leftX, startY + 7*rowSpacing))) return;
       if (tryStart.apply(pumpkin_pieImage, new Point(rightX, startY + 7*rowSpacing))) return;
-      // row8
+      
       if (tryStart.apply(shrimpImage, new Point(leftX, startY + 8*rowSpacing))) return;
       if (tryStart.apply(sushiImage, new Point(rightX, startY + 8*rowSpacing))) return;
-      // row9
+      
       if (tryStart.apply(tboneImage, new Point(leftX, startY + 9*rowSpacing))) return;
       if (tryStart.apply(watermelonImage, new Point(rightX, startY + 9*rowSpacing))) return;
       mouseWasPressed = true;
@@ -236,7 +236,7 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
   private Imagesfood customer2;
   private BufferedImage cloudImage = null;
   private Imagesfood cloud;
-  // apple image that appears inside the cloud (separate from inventory apple)
+  
   private BufferedImage cloudAppleImage = null;
   private Imagesfood cloudApple;
   private boolean showCloudApple = false;
@@ -248,7 +248,7 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
   private Imagesfood money;
   private BufferedImage pointImage = null;
   private Imagesfood point;
-  // Drag copies created when user clicks inventory items. Originals remain.
+  
   private static class DragItem {
     BufferedImage img;
     int vx, vy, vW, vH;
@@ -259,7 +259,7 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
   }
   private final java.util.List<DragItem> activeDrags = new java.util.ArrayList<>();
   private DragItem currentDrag = null;
-  // Virtual design resolution the UI is laid out in
+  
   private static final int VIRTUAL_WIDTH = 1535;
   private static final int VIRTUAL_HEIGHT = 830;
 
@@ -267,14 +267,14 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
   public void paintComponent(Graphics g)
   {
     super.paintComponent(g);
-    // Creates a red background
+    
     
     g.setColor(Color.BLACK);
     
     g.fillRect(0, 0, getWidth(), getHeight());
 
-    // Precompute virtual -> actual scale and offsets so all drawings
-    // keep locked positions relative to a 1535x830 design resolution.
+    
+    
     int panelW = getWidth();
     int panelH = getHeight();
     double scale = Math.min((double) panelW / VIRTUAL_WIDTH, (double) panelH / VIRTUAL_HEIGHT);
@@ -283,21 +283,21 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
     @SuppressWarnings("unused")
     int offsetY = (int) Math.round((panelH - VIRTUAL_HEIGHT * scale) / 2.0);
 
-    // Renders all the images
+    
     if (storeImageOriginal != null)
     {
-      // Draw store background at fixed position (not affected by uiShift)
+      
       drawVirtualImage(g, storeImageOriginal, 0, 0, VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
     }
     
     if (showInventory) {
-    // Calculate the tan box width based on the longest food label text
+    
     Graphics2D g2Measure = (Graphics2D) g;
     Font originalFont = g2Measure.getFont();
     Font bigFont = originalFont.deriveFont(originalFont.getSize2D() * 2f);
     g2Measure.setFont(bigFont);
     FontMetrics fm = g2Measure.getFontMetrics();
-    g2Measure.setFont(originalFont); // restore original font
+    g2Measure.setFont(originalFont); 
     
     String[] foodNames = {"Apple", "Apple Pie", "Avocado", "Boar Head", "Bread", "Cheese", 
                           "Cheesecake", "Chicken", "Cookie", "Dragon Fruit", "Fish", "Fried Eggs",
@@ -308,34 +308,34 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       maxTextWidth = Math.max(maxTextWidth, textWidth);
     }
     
-    // Convert pixel width back to virtual coordinates (divide by scale)
+    
     int maxTextWidthVirtual = (int) Math.round(maxTextWidth / scale);
     
-    // Text starts at: rightX (290) + V_IMG_W (50) + 8 = 348
-    // Box should extend past the text: 348 + maxTextWidthVirtual + padding
-    int tanBoxWidth = 290 + 50 + 8 + maxTextWidthVirtual -20; // rightmost column + small padding
     
-    // Draw tan background behind foods (width extends based on longest text)
-    g.setColor(new Color(210, 180, 140)); // Tan color
-    // Draw box at base (30,70) shifted by uiShiftX/uiShiftY
+    
+    int tanBoxWidth = 290 + 50 + 8 + maxTextWidthVirtual -20; 
+    
+    
+    g.setColor(new Color(210, 180, 140)); 
+    
     drawVirtualRectangle(g, 30 + uiShiftX, 70 + uiShiftY, tanBoxWidth, 620);
     
-    // Draw black border around tan box
-    g.setColor(Color.BLACK);
-    drawVirtualBorder(g, 30 + uiShiftX, 70 + uiShiftY, tanBoxWidth, 620, 4); // 4px border thickness
     
-    // Draw "Inventory" title at top center of box (below border)
+    g.setColor(Color.BLACK);
+    drawVirtualBorder(g, 30 + uiShiftX, 70 + uiShiftY, tanBoxWidth, 620, 4); 
+    
+    
     drawVirtualTitleString(g, "Inventory", 30 + uiShiftX + tanBoxWidth / 2, 120 + uiShiftY);
         
-    // Layout constants for the item list
+    
     final int V_IMG_W = 50;
     final int V_IMG_H = 50;
-    // moved 25px right and 15px down from original values (small extra nudge to the right)
-    // then shifted overall UI by uiShiftX/uiShiftY
+    
+    
     final int leftX = 35 + uiShiftX;
     final int rightX = 220 + uiShiftX;
     final int startY = 135 + uiShiftY;
-    // decreased vertical spacing to squish items closer together
+    
     final int rowSpacing = 55;
 
     if (appleImage != null)
@@ -512,63 +512,63 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
 
     if (man_idleImage != null)
     {
-      int imgX = 1300; // fixed position — not affected by uiShift
-      int imgY = 520;  // fixed position — not affected by uiShift
-      // draw at its own image size but scaled to virtual coords
+      int imgX = 1300; 
+      int imgY = 520;  
+      
       drawVirtualImage(g, man_idleImage, imgX, imgY, man_idleImage.getWidth(), man_idleImage.getHeight());
     }
 
-    // Draw shopping cart image on top (layered above foods)
+    
     if (shoppingcartImage != null)
     {
-      // draw shopping cart at base (50,70) shifted by uiShiftX/uiShiftY
+      
       drawVirtualImage(g, shoppingcartImage, 50 + uiShiftX, 70 + uiShiftY, 60, 60);
     }
     if (customer2Image != null)
     {
-      // draw shopping cart at base (50,70) shifted by uiShiftX/uiShiftY
+      
       drawVirtualImage(g, customer2Image, 750 + uiShiftX, 400 + uiShiftY, 250, 250);
     }
     if (cloudImage != null)
     {
-      // draw shopping cart at base (50,70) shifted by uiShiftX/uiShiftY
+      
       drawVirtualImage(g, cloudImage, 900 + uiShiftX, 450 + uiShiftY, 100, 100);
     }
     if (cloudAppleImage != null)
     {
-      // draw the apple inside the cloud at the same position/size
+      
       drawVirtualImage(g, cloudAppleImage, 933 + uiShiftX, 490 + uiShiftY, 30, 30);
     }
 
     if (questionImage != null)
     {
-      // draw question image at fixed position (not affected by uiShift)
+      
       drawVirtualImage(g, questionImage, 800, 80, 150, 150);
     }
 
     if (pointImage != null)
     {
-      // draw point image at fixed position (not affected by uiShift)
+      
       drawVirtualImage(g, pointImage, 250, 60, 250, 100);
     }
     if (moneyImage != null)
     {
-      // draw money image at fixed position (not affected by uiShift)
+      
       drawVirtualImage(g, moneyImage, 480, 60, 250, 100);
     }
 
-    // draw active drag copies on top
+    
     if (!activeDrags.isEmpty()) {
       for (DragItem d : activeDrags) {
         if (d != null && d.img != null) drawVirtualImage(g, d.img, d.vx, d.vy, d.vW, d.vH);
       }
     }
 
-    // No custom cursor image — let the system cursor be used.
-    // (Cursor-follow image removed.)
+    
+    
   }
 
-  // Helper: draw a buffered image positioned/sized in virtual coordinates
+  
   private void drawVirtualImage(Graphics g, BufferedImage img, int vx, int vy, int vWidth, int vHeight)
   {
     if (img == null) return;
@@ -584,7 +584,7 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
     g.drawImage(img, ax, ay, aw, ah, this);
   }
 
-  // Helper: draw a rectangle at virtual coordinates
+  
   private void drawVirtualRectangle(Graphics g, int vx, int vy, int vWidth, int vHeight)
   {
     int panelW = getWidth();
@@ -599,7 +599,7 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
     g.fillRect(ax, ay, aw, ah);
   }
 
-  // Helper: draw text anchored at virtual coordinates
+  
   private void drawVirtualString(Graphics g, String text, int vx, int vy)
   {
     int panelW = getWidth();
@@ -612,17 +612,17 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
     Graphics2D g2 = (Graphics2D) g;
     Font oldFont = g2.getFont();
     Color oldColor = g2.getColor();
-    // Make the font double size for these labels
+    
     Font bigFont = oldFont.deriveFont(oldFont.getSize2D() * 2f);
     g2.setFont(bigFont);
     g2.setColor(Color.BLACK);
     g2.drawString(text, ax, ay);
-    // restore original font and color
+    
     g2.setFont(oldFont);
     g2.setColor(oldColor);
   }
 
-  // Helper: draw a border at virtual coordinates
+  
   private void drawVirtualBorder(Graphics g, int vx, int vy, int vWidth, int vHeight, int borderThickness)
   {
     int panelW = getWidth();
@@ -640,7 +640,7 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
     g2.drawRect(ax, ay, aw, ah);
   }
 
-  // Helper: draw title text centered and bold at virtual coordinates
+  
   private void drawVirtualTitleString(Graphics g, String text, int vxCenter, int vy)
   {
     int panelW = getWidth();
@@ -652,7 +652,7 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
     Graphics2D g2 = (Graphics2D) g;
     Font oldFont = g2.getFont();
     Color oldColor = g2.getColor();
-    // Make the font bold and larger
+    
     Font boldFont = oldFont.deriveFont(java.awt.Font.BOLD, oldFont.getSize2D() * 2.5f);
     g2.setFont(boldFont);
     g2.setColor(Color.BLACK);
@@ -660,7 +660,7 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
     int textWidth = fm.stringWidth(text);
     int ax = offsetX + (int) Math.round(vxCenter * scale) - textWidth / 2;
     g2.drawString(text, ax, ay);
-    // restore original font and color
+    
     g2.setFont(oldFont);
     g2.setColor(oldColor);
   }
@@ -686,7 +686,7 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
 
             panel.store = new Imagesfood("store");
             panel.storeImageOriginal = panel.store.getImage();
-            panel.storeImageScaled = null; // ensure cached scaled image will be created on first paint
+            panel.storeImageScaled = null; 
             frame.setSize(800, 600);
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setVisible(true);
@@ -731,7 +731,7 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
             panel.tboneImage = panel.tbone.getImage();
             panel.watermelon = new Imagesfood("watermelon");
             panel.watermelonImage = panel.watermelon.getImage();
-            // Load image from assets (synchronously) and repaint.
+            
             
             panel.shoppingcart = new Imagesfood("shoppingcart");
             panel.shoppingcartImage = panel.shoppingcart.getImage();
@@ -748,20 +748,20 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
             panel.moneyImage = panel.money.getImage();
 
             JLabel pointLable = new JLabel();
-            pointLable.setBounds(390, 124, 500, 100); // wide enough for the panel
+            pointLable.setBounds(390, 124, 500, 100); 
             pointLable.setFont(new Font("Arial", Font.BOLD, 40));
             pointLable.setText(100 + "");
             panel.add(pointLable);
 
             JLabel moneyLable = new JLabel();
-            moneyLable.setBounds(610, 127, 250, 100); // wide enough for the panel
+            moneyLable.setBounds(610, 127, 250, 100); 
             moneyLable.setFont(new Font("Arial", Font.BOLD, 40));
             moneyLable.setText(500 + "");
             panel.add(moneyLable);
 
-            // cursor image removed - use system cursor instead
+            
 
-            // Debug: print which images loaded successfully
+            
             System.out.println("Image load status:");
             System.out.println("store=" + (panel.storeImageOriginal != null));
             System.out.println("apple=" + (panel.appleImage != null));
@@ -786,7 +786,7 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
             System.out.println("watermelon=" + (panel.watermelonImage != null));
             System.out.println("man_idle=" + (panel.man_idleImage != null));
           
-            // Load customer2 image after 10 seconds
+            
            Timer delayedImageTimer = new Timer(2000, e -> {
                     panel.customer2 = new Imagesfood("customer2_idle/1");
                     panel.customer2Image = panel.customer2.getImage();
@@ -794,7 +794,7 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
                     panel.cloud = new Imagesfood("cloud");
                     panel.cloudImage = panel.cloud.getImage(); 
                     System.out.println("Delayed cloud image loaded: " + (panel.cloudImage != null));
-                  // load an apple to appear inside the cloud
+                  
                   panel.cloudApple = new Imagesfood("apple");
                   panel.cloudAppleImage = panel.cloudApple.getImage(); 
                   panel.showCloudApple = (panel.cloudAppleImage != null);
@@ -809,12 +809,12 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
                     panel.cloud = new Imagesfood("cloud");
                     panel.cloudImage = panel.cloud.getImage(); 
                     System.out.println("Delayed cloud image loaded: " + (panel.cloudImage != null));
-                  // load an apple to appear inside the cloud
+                  
                   panel.cloudApple = new Imagesfood("apple");
                   panel.cloudAppleImage = panel.cloudApple.getImage(); 
                   panel.showCloudApple = (panel.cloudAppleImage != null);
                   System.out.println("Delayed cloud-apple image loaded: " + (panel.cloudAppleImage != null));
-                  //panel.customer2Image.moveObject();
+                  
                     panel.repaint();
               });
               Timer delayedImageTimer2 = new Timer(3000, e -> {
@@ -824,7 +824,7 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
                     panel.cloud = new Imagesfood("cloud");
                     panel.cloudImage = panel.cloud.getImage(); 
                     System.out.println("Delayed cloud image loaded: " + (panel.cloudImage != null));
-                  // load an apple to appear inside the cloud
+                  
                   panel.cloudApple = new Imagesfood("apple");
                   panel.cloudAppleImage = panel.cloudApple.getImage(); 
                   panel.showCloudApple = (panel.cloudAppleImage != null);
@@ -839,12 +839,12 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
                     panel.cloud = new Imagesfood("cloud");
                     panel.cloudImage = panel.cloud.getImage(); 
                     System.out.println("Delayed cloud image loaded: " + (panel.cloudImage != null));
-                  // load an apple to appear inside the cloud
+                  
                   panel.cloudApple = new Imagesfood("apple");
                   panel.cloudAppleImage = panel.cloudApple.getImage(); 
                   panel.showCloudApple = (panel.cloudAppleImage != null);
                   System.out.println("Delayed cloud-apple image loaded: " + (panel.cloudAppleImage != null));
-                  //panel.customer2Image.drawImage(src, 0, 0, targetW, targetH, null);
+                  
               });
               Timer delayedImageTimer4 = new Timer(4000, e -> {
                     panel.customer2 = new Imagesfood("customer2_walking/4");
@@ -853,7 +853,7 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
                     panel.cloud = new Imagesfood("cloud");
                     panel.cloudImage = panel.cloud.getImage(); 
                     System.out.println("Delayed cloud image loaded: " + (panel.cloudImage != null));
-                  // load an apple to appear inside the cloud
+                  
                   panel.cloudApple = new Imagesfood("apple");
                   panel.cloudAppleImage = panel.cloudApple.getImage(); 
                   panel.showCloudApple = (panel.cloudAppleImage != null);
@@ -868,12 +868,12 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
                     panel.cloud = new Imagesfood("cloud");
                     panel.cloudImage = panel.cloud.getImage(); 
                     System.out.println("Delayed cloud image loaded: " + (panel.cloudImage != null));
-                  // load an apple to appear inside the cloud
+                  
                   panel.cloudApple = new Imagesfood("apple");
                   panel.cloudAppleImage = panel.cloudApple.getImage(); 
                   panel.showCloudApple = (panel.cloudAppleImage != null);
                   System.out.println("Delayed cloud-apple image loaded: " + (panel.cloudAppleImage != null));
-                  //panel.customer2Image.moveObject();
+                  
                     panel.repaint();
               });
               Timer delayedImageTimer6 = new Timer(5000, e -> {
@@ -883,7 +883,7 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
                     panel.cloud = new Imagesfood("cloud");
                     panel.cloudImage = panel.cloud.getImage(); 
                     System.out.println("Delayed cloud image loaded: " + (panel.cloudImage != null));
-                  // load an apple to appear inside the cloud
+                  
                   panel.cloudApple = new Imagesfood("apple");
                   panel.cloudAppleImage = panel.cloudApple.getImage(); 
                   panel.showCloudApple = (panel.cloudAppleImage != null);
@@ -898,12 +898,12 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
                     panel.cloud = new Imagesfood("cloud");
                     panel.cloudImage = panel.cloud.getImage(); 
                     System.out.println("Delayed cloud image loaded: " + (panel.cloudImage != null));
-                  // load an apple to appear inside the cloud
+                  
                   panel.cloudApple = new Imagesfood("apple");
                   panel.cloudAppleImage = panel.cloudApple.getImage(); 
                   panel.showCloudApple = (panel.cloudAppleImage != null);
                   System.out.println("Delayed cloud-apple image loaded: " + (panel.cloudAppleImage != null));
-                  //panel.customer2Image.drawImage(src, 0, 0, targetW, targetH, null);
+                  
               });
               Timer delayedImageTimer8 = new Timer(6000, e -> {
                     panel.customer2 = new Imagesfood("customer2_walking/8");
@@ -912,12 +912,12 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
                     panel.cloud = new Imagesfood("cloud");
                     panel.cloudImage = panel.cloud.getImage(); 
                     System.out.println("Delayed cloud image loaded: " + (panel.cloudImage != null));
-                  // load an apple to appear inside the cloud
+                  
                   panel.cloudApple = new Imagesfood("apple");
                   panel.cloudAppleImage = panel.cloudApple.getImage(); 
                   panel.showCloudApple = (panel.cloudAppleImage != null);
                   System.out.println("Delayed cloud-apple image loaded: " + (panel.cloudAppleImage != null));
-                  //panel.customer2Image.drawImage(src, 0, 0, targetW, targetH, null);
+                  
               });
               Timer delayedImageTimer9 = new Timer(6500, e -> {
                     panel.customer2 = new Imagesfood("customer2_walking/9");
@@ -926,12 +926,12 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
                     panel.cloud = new Imagesfood("cloud");
                     panel.cloudImage = panel.cloud.getImage(); 
                     System.out.println("Delayed cloud image loaded: " + (panel.cloudImage != null));
-                  // load an apple to appear inside the cloud
+                  
                   panel.cloudApple = new Imagesfood("apple");
                   panel.cloudAppleImage = panel.cloudApple.getImage(); 
                   panel.showCloudApple = (panel.cloudAppleImage != null);
                   System.out.println("Delayed cloud-apple image loaded: " + (panel.cloudAppleImage != null));
-                  //panel.customer2Image.drawImage(src, 0, 0, targetW, targetH, null);
+                  
               });
               Timer delayedImageTimer10 = new Timer(7000, e -> {
                     panel.customer2 = new Imagesfood("customer2_walking/10");
@@ -940,12 +940,12 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
                     panel.cloud = new Imagesfood("cloud");
                     panel.cloudImage = panel.cloud.getImage(); 
                     System.out.println("Delayed cloud image loaded: " + (panel.cloudImage != null));
-                  // load an apple to appear inside the cloud
+                  
                   panel.cloudApple = new Imagesfood("apple");
                   panel.cloudAppleImage = panel.cloudApple.getImage(); 
                   panel.showCloudApple = (panel.cloudAppleImage != null);
                   System.out.println("Delayed cloud-apple image loaded: " + (panel.cloudAppleImage != null));
-                  //panel.customer2Image.drawImage(src, 0, 0, targetW, targetH, null);
+                  
               });
               
 
@@ -983,7 +983,6 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
               delayedImageTimer9.start();
               delayedImageTimer10.start();
 
-            // --- Add a draggable apple component to the layered pane ---
             // Create an Imagesfood for the apple and a draggable component
             // Imagesfood draggableApple = new Imagesfood("apple");
             // javax.swing.JComponent appleComp = draggableApple.createDraggableComponent(900 + panel.uiShiftX, 450 + panel.uiShiftY);
