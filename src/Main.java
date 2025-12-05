@@ -131,8 +131,8 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
   }
 
   @Override
-    public void mouseClicked(MouseEvent e) {
-    
+  public void mouseClicked(MouseEvent e) {
+    // Optional: compute virtual coordinates if using scaling
     int panelW = getWidth();
     int panelH = getHeight();
     double scale = Math.min((double) panelW / VIRTUAL_WIDTH, (double) panelH / VIRTUAL_HEIGHT);
@@ -140,20 +140,19 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
     int offsetY = (int) Math.round((panelH - VIRTUAL_HEIGHT * scale) / 2.0);
     int vx = (int) Math.round((e.getX() - offsetX) / scale);
     int vy = (int) Math.round((e.getY() - offsetY) / scale);
+
+    // Check if click is inside the question image
     if (vx >= 800 && vx <= 950 && vy >= 80 && vy <= 230) {
-    if (questionPanel == null) {
-        questionPanel = new QuestionPanel();
-        questionPanel.setBounds(350, 270, 800, 500);
 
-        
         JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
-        topFrame.getLayeredPane().add(questionPanel, JLayeredPane.POPUP_LAYER);
-    }
 
-   
-    questionVisible = !questionVisible;
-    questionPanel.setVisible(questionVisible);
-    questionPanel.repaint();
+        // Create QuestionPanel only once
+        if (qp == null) {
+            qp = new QuestionPanel(topFrame);
+        }
+
+        // Toggle the small panel
+        qp.toggleQuestionPanel();
     }
 }
 
