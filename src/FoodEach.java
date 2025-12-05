@@ -8,6 +8,8 @@ public class FoodEach
   private int reqMoney;
   private boolean unlocked = false;
   public static ArrayList<String> allUnlockedFood = new ArrayList<String>();
+  
+  public static java.util.Map<String, FoodEach> registry = new java.util.HashMap<>();
   public FoodEach(String n, int p, int r, boolean u) {
     name = n;
     price = p;
@@ -16,6 +18,7 @@ public class FoodEach
     if (u) {
       allUnlockedFood.add(n);
     }
+    registry.put(n, this);
   }
   public String getName() {
     return name;
@@ -30,7 +33,7 @@ public class FoodEach
     return unlocked;
   }
   public boolean unlock(int money) {
-    //return true if successfully unlocks
+    
     if (unlocked) {
       return false;
     }
@@ -43,8 +46,12 @@ public class FoodEach
     }
   }
   public boolean buy(int money) {
-    //return true if purchase is successful
+    
     return money >= price;
+  }
+
+  public static FoodEach getByName(String n) {
+    return registry.get(n);
   }
 
 }
