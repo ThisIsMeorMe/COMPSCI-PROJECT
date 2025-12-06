@@ -6,99 +6,158 @@ import javax.swing.*;
 
 public class Main extends JPanel implements MouseMotionListener, MouseListener
 {
-  
   public static Main mainInstance = null;
   private boolean mouseWasReleased = false;
   private boolean mouseWasPressed = false;
-  
+
   private int mouseX = -10;
   private int mouseY = -10;
   private Timer refreshTimer;
-  
+
   private boolean showInventory = false;
-  
+
   private int uiShiftX = 70;
-  
+
   private int uiShiftY = 20;
-  
+
   private QuestionPanel questionPanel = null;
   private boolean questionVisible = false;
-  
+
   public Main()
   {
     addMouseMotionListener(this);
     addMouseListener(this);
     refreshTimer = new Timer(16, e -> { updatePositions(); repaint(); });
     refreshTimer.start();
+
+    SoundManager.playBackgroundMusic();
   }
 
-  
-  private void updatePositions() {
+  private void updatePositions()
+  {
     long now = System.currentTimeMillis();
     long last = lastUpdateMillis <= 0 ? now : lastUpdateMillis;
     double dt = Math.max(0.0, (now - last) / 1000.0);
     lastUpdateMillis = now;
+    if (customer2ExitState == 1)
+    {
+      double dy = customer2Speed * dt;
+      customer2Vy += dy;
 
-    
-    if (customer2SpawnTimeMillis > 0L) {
-      long waited = now - customer2SpawnTimeMillis;
-      if (waited < customer2StartDelayMs) {
-        
-        lastUpdateMillis = now;
-        return;
-      } else {
-        
-        customer2Visible = true;
-        customer2SpawnTimeMillis = 0L;
-        
-        lastUpdateMillis = now;
-        return; 
+      if (customer2Vy >= 961)
+      {
+        customer2Vy = 961;
+        customer2ExitState = 2;
+        customer2ExitStartTime = now;
+        customer2Visible = false;
+      }
+    }
+    else if (customer2ExitState == 2)
+    {
+      long waited = now - customer2ExitStartTime;
+      if (waited >= 500)
+      {
+        customer2ExitState = 0;
+        customer2State = 0;
+        customer2Vy = 961;
+        customer2Vx = 0.7 * 1600;
+        customer2InitialVx = customer2Vx;
+        customer2SpawnTimeMillis = now;
+        customer2VerticalMovementStart = 0L;
+
+        try
+        {
+          java.util.List<String> unlocked = FoodEach.allUnlockedFood;
+          if (unlocked != null && !unlocked.isEmpty())
+          {
+            String key = unlocked.get(rand.nextInt(unlocked.size()));
+            cloudFoodKey = key;
+            Imagesfood f = new Imagesfood(key);
+            BufferedImage bi = f.getImage();
+            if (bi != null)
+            {
+              cloudApple = f;
+              cloudAppleImage = bi;
+            }
+          }
+        }
+        catch (Throwable t)
+        {
+        }
       }
     }
 
-    
-    if (customer2State != 2) {
-      int targetManX = 1300; 
-      int targetManY = 520;  
-      
-      double finalY = targetManY - customer2FinalOffsetBelow;
-      double vFinalX = targetManX; 
+    if (customer2SpawnTimeMillis > 0L)
+    {
+      long waited = now - customer2SpawnTimeMillis;
+      if (waited < customer2StartDelayMs)
+      {
+        lastUpdateMillis = now;
+        return;
+      }
+      else
+      {
+        customer2Visible = true;
+        customer2SpawnTimeMillis = 0L;
 
-      if (customer2State == 0) {
-        
+        lastUpdateMillis = now;
+        return;
+      }
+    }
+
+    if (customer2State != 2)
+    {
+      int targetManX = 1300;
+      int targetManY = 520;
+
+      double finalY = targetManY - customer2FinalOffsetBelow;
+      double vFinalX = targetManX;
+
+      if (customer2State == 0)
+      {
         double dy = customer2Speed * dt;
-        if (customer2VerticalMovementStart == 0L) {
+        if (customer2VerticalMovementStart == 0L)
+        {
           customer2VerticalMovementStart = now;
           customer2VerticalMovementAccum = 0L;
           customer2AnimationPaused = false;
           customer2PausedFrameIndex = -1;
         }
-        if (customer2Vy <= finalY) {
-          
+        if (customer2Vy <= finalY)
+        {
           customer2Vy = finalY;
-          customer2State = 1; 
-        } else {
+          customer2State = 1;
+        }
+        else
+        {
           double newY = customer2Vy - dy;
-          if (newY <= finalY) {
+          if (newY <= finalY)
+          {
             customer2Vy = finalY;
             customer2State = 1;
-          } else {
+          }
+          else
+          {
             customer2Vy = newY;
             customer2VerticalMovementAccum += (long) (dt * 1000.0);
-              
           }
         }
-      } else if (customer2State == 1) {
-        
-        
+      }
+      else if (customer2State == 1)
+      {
         double vFinalXFrac = customer2InitialVx + (vFinalX - customer2InitialVx) * customer2HorizontalFraction;
         double dx = customer2Speed * dt;
-        if (Math.abs(customer2Vx - vFinalXFrac) <= dx) {
+        if (Math.abs(customer2Vx - vFinalXFrac) <= dx)
+        {
           customer2Vx = vFinalXFrac;
-          customer2State = 2; 
-        } else if (customer2Vx < vFinalXFrac) {
+          customer2State = 2;
+        }
+        else if (customer2Vx < vFinalXFrac)
+        {
           customer2Vx += dx;
-        } else {
+        }
+        else
+        {
           customer2Vx -= dx;
         }
       }
@@ -131,8 +190,8 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
   }
 
   @Override
-    public void mouseClicked(MouseEvent e) {
-    
+  public void mouseClicked(MouseEvent e)
+  {
     int panelW = getWidth();
     int panelH = getHeight();
     double scale = Math.min((double) panelW / VIRTUAL_WIDTH, (double) panelH / VIRTUAL_HEIGHT);
@@ -140,22 +199,24 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
     int offsetY = (int) Math.round((panelH - VIRTUAL_HEIGHT * scale) / 2.0);
     int vx = (int) Math.round((e.getX() - offsetX) / scale);
     int vy = (int) Math.round((e.getY() - offsetY) / scale);
-    if (vx >= 800 && vx <= 950 && vy >= 80 && vy <= 230) {
-    if (questionPanel == null) {
+    if (vx >= 800 && vx <= 950 && vy >= 20 && vy <= 170)
+    {
+      if (questionPanel == null)
+      {
         questionPanel = new QuestionPanel();
-        questionPanel.setBounds(350, 270, 800, 500);
+        questionPanel.setBounds(200, 150, 1150, 520);
 
-        
         JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
-        topFrame.getLayeredPane().add(questionPanel, JLayeredPane.POPUP_LAYER);
-    }
+        topFrame.getLayeredPane().add(questionPanel, JLayeredPane.DRAG_LAYER);
+      }
 
-   
-    questionVisible = !questionVisible;
-    questionPanel.setVisible(questionVisible);
-    questionPanel.repaint();
+      SoundManager.playClickSound();
+
+      questionVisible = !questionVisible;
+      questionPanel.setVisible(questionVisible);
+      questionPanel.repaint();
     }
-}
+  }
 
   @Override
   public void mousePressed(MouseEvent e)
@@ -170,13 +231,15 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
     int vy = (int) Math.round((e.getY() - offsetY) / scale);
 
     
-    if (vx >= 50 + uiShiftX && vx <= 50 + uiShiftX + 60 && vy >= 70 + uiShiftY && vy <= 70 + uiShiftY + 60) {
+    if (vx >= 50 + uiShiftX && vx <= 50 + uiShiftX + 60 && vy >= 70 + uiShiftY && vy <= 70 + uiShiftY + 60)
+    {
       showInventory = !showInventory;
       repaint();
       return;
     }
 
-    if (showInventory) {
+    if (showInventory)
+    {
       final int V_IMG_W = 50;
       final int V_IMG_H = 50;
       final int leftX = 35 + uiShiftX;
@@ -186,161 +249,201 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
 
       
       
-      if (appleImage != null && !isFoodUnlocked("apple")) {
+      if (appleImage != null && !isFoodUnlocked("apple"))
+      {
         int imgX = leftX, imgY = startY + 0*rowSpacing;
-        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H)
+        {
           consumePointOnClick();
           attemptUnlock("apple");
           return;
         }
       }
-      if (apple_pieImage != null && !isFoodUnlocked("apple_pie")) {
+      if (apple_pieImage != null && !isFoodUnlocked("apple_pie"))
+      {
         int imgX = rightX, imgY = startY + 0*rowSpacing;
-        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H)
+        {
           consumePointOnClick();
           attemptUnlock("apple_pie");
           return;
         }
       }
-      if (avocadoImage != null && !isFoodUnlocked("avocado")) {
+      if (avocadoImage != null && !isFoodUnlocked("avocado"))
+      {
         int imgX = leftX, imgY = startY + 1*rowSpacing;
-        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H)
+        {
           consumePointOnClick();
           attemptUnlock("avocado");
           return;
         }
       }
-      if (boar_headImage != null && !isFoodUnlocked("boar_head")) {
+      if (boar_headImage != null && !isFoodUnlocked("boar_head"))
+      {
         int imgX = rightX, imgY = startY + 1*rowSpacing;
-        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H)
+        {
           consumePointOnClick();
           attemptUnlock("boar_head");
           return;
         }
       }
-      if (breadImage != null && !isFoodUnlocked("bread")) {
+      if (breadImage != null && !isFoodUnlocked("bread"))
+      {
         int imgX = leftX, imgY = startY + 2*rowSpacing;
-        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H)
+        {
           consumePointOnClick();
           attemptUnlock("bread");
           return;
         }
       }
-      if (cheeseImage != null && !isFoodUnlocked("cheese")) {
+      if (cheeseImage != null && !isFoodUnlocked("cheese"))
+      {
         int imgX = rightX, imgY = startY + 2*rowSpacing;
-        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H)
+        {
           consumePointOnClick();
           attemptUnlock("cheese");
           return;
         }
       }
-      if (cheesecakeImage != null && !isFoodUnlocked("cheesecake")) {
+      if (cheesecakeImage != null && !isFoodUnlocked("cheesecake"))
+      {
         int imgX = leftX, imgY = startY + 3*rowSpacing;
-        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H)
+        {
           consumePointOnClick();
           attemptUnlock("cheesecake");
           return;
         }
       }
-      if (chickenImage != null && !isFoodUnlocked("chicken")) {
+      if (chickenImage != null && !isFoodUnlocked("chicken"))
+      {
         int imgX = rightX, imgY = startY + 3*rowSpacing;
-        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H)
+        {
           consumePointOnClick();
           attemptUnlock("chicken");
           return;
         }
       }
-      if (cookieImage != null && !isFoodUnlocked("cookie")) {
+      if (cookieImage != null && !isFoodUnlocked("cookie"))
+      {
         int imgX = leftX, imgY = startY + 4*rowSpacing;
-        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H)
+        {
           consumePointOnClick();
           attemptUnlock("cookie");
           return;
         }
       }
-      if (dragon_fruitImage != null && !isFoodUnlocked("dragon_fruit")) {
+      if (dragon_fruitImage != null && !isFoodUnlocked("dragon_fruit"))
+    {
         int imgX = rightX, imgY = startY + 4*rowSpacing;
-        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H)
+    {
           consumePointOnClick();
           attemptUnlock("dragon_fruit");
           return;
         }
       }
-      if (fishImage != null && !isFoodUnlocked("fish")) {
+      if (fishImage != null && !isFoodUnlocked("fish"))
+    {
         int imgX = leftX, imgY = startY + 5*rowSpacing;
-        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H)
+    {
           consumePointOnClick();
           attemptUnlock("fish");
           return;
         }
       }
-      if (fried_eggsImage != null && !isFoodUnlocked("fried_eggs")) {
+      if (fried_eggsImage != null && !isFoodUnlocked("fried_eggs"))
+    {
         int imgX = rightX, imgY = startY + 5*rowSpacing;
-        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H)
+    {
           consumePointOnClick();
           attemptUnlock("fried_eggs");
           return;
         }
       }
-      if (honeyImage != null && !isFoodUnlocked("honey")) {
+      if (honeyImage != null && !isFoodUnlocked("honey"))
+    {
         int imgX = leftX, imgY = startY + 6*rowSpacing;
-        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H)
+    {
           consumePointOnClick();
           attemptUnlock("honey");
           return;
         }
       }
-      if (pineappleImage != null && !isFoodUnlocked("pineapple")) {
+      if (pineappleImage != null && !isFoodUnlocked("pineapple"))
+    {
         int imgX = rightX, imgY = startY + 6*rowSpacing;
-        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H)
+    {
           consumePointOnClick();
           attemptUnlock("pineapple");
           return;
         }
       }
-      if (pretzelImage != null && !isFoodUnlocked("pretzel")) {
+      if (pretzelImage != null && !isFoodUnlocked("pretzel"))
+    {
         int imgX = leftX, imgY = startY + 7*rowSpacing;
-        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H)
+    {
           consumePointOnClick();
           attemptUnlock("pretzel");
           return;
         }
       }
-      if (pumpkin_pieImage != null && !isFoodUnlocked("pumpkin_pie")) {
+      if (pumpkin_pieImage != null && !isFoodUnlocked("pumpkin_pie"))
+    {
         int imgX = rightX, imgY = startY + 7*rowSpacing;
-        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H)
+    {
           consumePointOnClick();
           attemptUnlock("pumpkin_pie");
           return;
         }
       }
-      if (shrimpImage != null && !isFoodUnlocked("shrimp")) {
+      if (shrimpImage != null && !isFoodUnlocked("shrimp"))
+    {
         int imgX = leftX, imgY = startY + 8*rowSpacing;
-        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H)
+    {
           consumePointOnClick();
           attemptUnlock("shrimp");
           return;
         }
       }
-      if (sushiImage != null && !isFoodUnlocked("sushi")) {
+      if (sushiImage != null && !isFoodUnlocked("sushi"))
+    {
         int imgX = rightX, imgY = startY + 8*rowSpacing;
-        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H)
+    {
           consumePointOnClick();
           attemptUnlock("sushi");
           return;
         }
       }
-      if (tboneImage != null && !isFoodUnlocked("t-bone")) {
+      if (tboneImage != null && !isFoodUnlocked("t-bone"))
+    {
         int imgX = leftX, imgY = startY + 9*rowSpacing;
-        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H)
+    {
           consumePointOnClick();
           attemptUnlock("t-bone");
           return;
         }
       }
-      if (watermelonImage != null && !isFoodUnlocked("watermelon")) {
+      if (watermelonImage != null && !isFoodUnlocked("watermelon"))
+    {
         int imgX = rightX, imgY = startY + 9*rowSpacing;
-        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H)
+    {
           consumePointOnClick();
           attemptUnlock("watermelon");
           return;
@@ -349,161 +452,201 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
 
       
       
-      if (appleImage != null && isFoodUnlocked("apple")) {
+      if (appleImage != null && isFoodUnlocked("apple"))
+    {
         int imgX = leftX, imgY = startY + 0*rowSpacing;
-        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H)
+    {
           DragItem di = new DragItem(appleImage, imgX, imgY, V_IMG_W, V_IMG_H, "apple");
           di.offsetX = vx - imgX; di.offsetY = vy - imgY;
           consumePointOnClick(); activeDrags.add(di); currentDrag = di; repaint(); return;
         }
       }
-      if (apple_pieImage != null && isFoodUnlocked("apple_pie")) {
+      if (apple_pieImage != null && isFoodUnlocked("apple_pie"))
+    {
         int imgX = rightX, imgY = startY + 0*rowSpacing;
-        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H)
+    {
           DragItem di = new DragItem(apple_pieImage, imgX, imgY, V_IMG_W, V_IMG_H, "apple_pie");
           di.offsetX = vx - imgX; di.offsetY = vy - imgY;
           consumePointOnClick(); activeDrags.add(di); currentDrag = di; repaint(); return;
         }
       }
-      if (avocadoImage != null && isFoodUnlocked("avocado")) {
+      if (avocadoImage != null && isFoodUnlocked("avocado"))
+    {
         int imgX = leftX, imgY = startY + 1*rowSpacing;
-        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H)
+    {
           DragItem di = new DragItem(avocadoImage, imgX, imgY, V_IMG_W, V_IMG_H, "avocado");
           di.offsetX = vx - imgX; di.offsetY = vy - imgY;
           consumePointOnClick(); activeDrags.add(di); currentDrag = di; repaint(); return;
         }
       }
-      if (boar_headImage != null && isFoodUnlocked("boar_head")) {
+      if (boar_headImage != null && isFoodUnlocked("boar_head"))
+    {
         int imgX = rightX, imgY = startY + 1*rowSpacing;
-        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H)
+    {
           DragItem di = new DragItem(boar_headImage, imgX, imgY, V_IMG_W, V_IMG_H, "boar_head");
           di.offsetX = vx - imgX; di.offsetY = vy - imgY;
           consumePointOnClick(); activeDrags.add(di); currentDrag = di; repaint(); return;
         }
       }
-      if (breadImage != null && isFoodUnlocked("bread")) {
+      if (breadImage != null && isFoodUnlocked("bread"))
+    {
         int imgX = leftX, imgY = startY + 2*rowSpacing;
-        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H)
+    {
           DragItem di = new DragItem(breadImage, imgX, imgY, V_IMG_W, V_IMG_H, "bread");
           di.offsetX = vx - imgX; di.offsetY = vy - imgY;
           consumePointOnClick(); activeDrags.add(di); currentDrag = di; repaint(); return;
         }
       }
-      if (cheeseImage != null && isFoodUnlocked("cheese")) {
+      if (cheeseImage != null && isFoodUnlocked("cheese"))
+    {
         int imgX = rightX, imgY = startY + 2*rowSpacing;
-        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H)
+    {
           DragItem di = new DragItem(cheeseImage, imgX, imgY, V_IMG_W, V_IMG_H, "cheese");
           di.offsetX = vx - imgX; di.offsetY = vy - imgY;
           consumePointOnClick(); activeDrags.add(di); currentDrag = di; repaint(); return;
         }
       }
-      if (cheesecakeImage != null && isFoodUnlocked("cheesecake")) {
+      if (cheesecakeImage != null && isFoodUnlocked("cheesecake"))
+    {
         int imgX = leftX, imgY = startY + 3*rowSpacing;
-        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H)
+    {
           DragItem di = new DragItem(cheesecakeImage, imgX, imgY, V_IMG_W, V_IMG_H, "cheesecake");
           di.offsetX = vx - imgX; di.offsetY = vy - imgY;
           consumePointOnClick(); activeDrags.add(di); currentDrag = di; repaint(); return;
         }
       }
-      if (chickenImage != null && isFoodUnlocked("chicken")) {
+      if (chickenImage != null && isFoodUnlocked("chicken"))
+    {
         int imgX = rightX, imgY = startY + 3*rowSpacing;
-        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H)
+    {
           DragItem di = new DragItem(chickenImage, imgX, imgY, V_IMG_W, V_IMG_H, "chicken");
           di.offsetX = vx - imgX; di.offsetY = vy - imgY;
           consumePointOnClick(); activeDrags.add(di); currentDrag = di; repaint(); return;
         }
       }
-      if (cookieImage != null && isFoodUnlocked("cookie")) {
+      if (cookieImage != null && isFoodUnlocked("cookie"))
+    {
         int imgX = leftX, imgY = startY + 4*rowSpacing;
-        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H)
+    {
           DragItem di = new DragItem(cookieImage, imgX, imgY, V_IMG_W, V_IMG_H, "cookie");
           di.offsetX = vx - imgX; di.offsetY = vy - imgY;
           consumePointOnClick(); activeDrags.add(di); currentDrag = di; repaint(); return;
         }
       }
-      if (dragon_fruitImage != null && isFoodUnlocked("dragon_fruit")) {
+      if (dragon_fruitImage != null && isFoodUnlocked("dragon_fruit"))
+    {
         int imgX = rightX, imgY = startY + 4*rowSpacing;
-        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H)
+    {
           DragItem di = new DragItem(dragon_fruitImage, imgX, imgY, V_IMG_W, V_IMG_H, "dragon_fruit");
           di.offsetX = vx - imgX; di.offsetY = vy - imgY;
           consumePointOnClick(); activeDrags.add(di); currentDrag = di; repaint(); return;
         }
       }
-      if (fishImage != null && isFoodUnlocked("fish")) {
+      if (fishImage != null && isFoodUnlocked("fish"))
+    {
         int imgX = leftX, imgY = startY + 5*rowSpacing;
-        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H)
+    {
           DragItem di = new DragItem(fishImage, imgX, imgY, V_IMG_W, V_IMG_H, "fish");
           di.offsetX = vx - imgX; di.offsetY = vy - imgY;
           consumePointOnClick(); activeDrags.add(di); currentDrag = di; repaint(); return;
         }
       }
-      if (fried_eggsImage != null && isFoodUnlocked("fried_eggs")) {
+      if (fried_eggsImage != null && isFoodUnlocked("fried_eggs"))
+    {
         int imgX = rightX, imgY = startY + 5*rowSpacing;
-        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H)
+    {
           DragItem di = new DragItem(fried_eggsImage, imgX, imgY, V_IMG_W, V_IMG_H, "fried_eggs");
           di.offsetX = vx - imgX; di.offsetY = vy - imgY;
           consumePointOnClick(); activeDrags.add(di); currentDrag = di; repaint(); return;
         }
       }
-      if (honeyImage != null && isFoodUnlocked("honey")) {
+      if (honeyImage != null && isFoodUnlocked("honey"))
+    {
         int imgX = leftX, imgY = startY + 6*rowSpacing;
-        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H)
+    {
           DragItem di = new DragItem(honeyImage, imgX, imgY, V_IMG_W, V_IMG_H, "honey");
           di.offsetX = vx - imgX; di.offsetY = vy - imgY;
           consumePointOnClick(); activeDrags.add(di); currentDrag = di; repaint(); return;
         }
       }
-      if (pineappleImage != null && isFoodUnlocked("pineapple")) {
+      if (pineappleImage != null && isFoodUnlocked("pineapple"))
+    {
         int imgX = rightX, imgY = startY + 6*rowSpacing;
-        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H)
+    {
           DragItem di = new DragItem(pineappleImage, imgX, imgY, V_IMG_W, V_IMG_H, "pineapple");
           di.offsetX = vx - imgX; di.offsetY = vy - imgY;
           consumePointOnClick(); activeDrags.add(di); currentDrag = di; repaint(); return;
         }
       }
-      if (pretzelImage != null && isFoodUnlocked("pretzel")) {
+      if (pretzelImage != null && isFoodUnlocked("pretzel"))
+    {
         int imgX = leftX, imgY = startY + 7*rowSpacing;
-        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H)
+    {
           DragItem di = new DragItem(pretzelImage, imgX, imgY, V_IMG_W, V_IMG_H, "pretzel");
           di.offsetX = vx - imgX; di.offsetY = vy - imgY;
           consumePointOnClick(); activeDrags.add(di); currentDrag = di; repaint(); return;
         }
       }
-      if (pumpkin_pieImage != null && isFoodUnlocked("pumpkin_pie")) {
+      if (pumpkin_pieImage != null && isFoodUnlocked("pumpkin_pie"))
+    {
         int imgX = rightX, imgY = startY + 7*rowSpacing;
-        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H)
+    {
           DragItem di = new DragItem(pumpkin_pieImage, imgX, imgY, V_IMG_W, V_IMG_H, "pumpkin_pie");
           di.offsetX = vx - imgX; di.offsetY = vy - imgY;
           consumePointOnClick(); activeDrags.add(di); currentDrag = di; repaint(); return;
         }
       }
-      if (shrimpImage != null && isFoodUnlocked("shrimp")) {
+      if (shrimpImage != null && isFoodUnlocked("shrimp"))
+    {
         int imgX = leftX, imgY = startY + 8*rowSpacing;
-        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H)
+    {
           DragItem di = new DragItem(shrimpImage, imgX, imgY, V_IMG_W, V_IMG_H, "shrimp");
           di.offsetX = vx - imgX; di.offsetY = vy - imgY;
           consumePointOnClick(); activeDrags.add(di); currentDrag = di; repaint(); return;
         }
       }
-      if (sushiImage != null && isFoodUnlocked("sushi")) {
+      if (sushiImage != null && isFoodUnlocked("sushi"))
+    {
         int imgX = rightX, imgY = startY + 8*rowSpacing;
-        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H)
+    {
           DragItem di = new DragItem(sushiImage, imgX, imgY, V_IMG_W, V_IMG_H, "sushi");
           di.offsetX = vx - imgX; di.offsetY = vy - imgY;
           consumePointOnClick(); activeDrags.add(di); currentDrag = di; repaint(); return;
         }
       }
-      if (tboneImage != null && isFoodUnlocked("t-bone")) {
+      if (tboneImage != null && isFoodUnlocked("t-bone"))
+    {
         int imgX = leftX, imgY = startY + 9*rowSpacing;
-        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H)
+    {
           DragItem di = new DragItem(tboneImage, imgX, imgY, V_IMG_W, V_IMG_H, "t-bone");
           di.offsetX = vx - imgX; di.offsetY = vy - imgY;
           consumePointOnClick(); activeDrags.add(di); currentDrag = di; repaint(); return;
         }
       }
-      if (watermelonImage != null && isFoodUnlocked("watermelon")) {
+      if (watermelonImage != null && isFoodUnlocked("watermelon"))
+    {
         int imgX = rightX, imgY = startY + 9*rowSpacing;
-        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H) {
+        if (vx >= imgX && vx <= imgX + V_IMG_W && vy >= imgY && vy <= imgY + V_IMG_H)
+    {
           DragItem di = new DragItem(watermelonImage, imgX, imgY, V_IMG_W, V_IMG_H, "watermelon");
           di.offsetX = vx - imgX; di.offsetY = vy - imgY;
           consumePointOnClick(); activeDrags.add(di); currentDrag = di; repaint(); return;
@@ -514,10 +657,12 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
   }
 
   @Override
-  public void mouseReleased(MouseEvent e) {
+  public void mouseReleased(MouseEvent e)
+    {
     mouseWasReleased = true;
     
-    if (currentDrag != null) {
+    if (currentDrag != null)
+    {
       
       int panelW = getWidth();
       int panelH = getHeight();
@@ -533,29 +678,21 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       int cloudW = 100, cloudH = 100;
       
       
-      if (vx >= cloudX && vx <= cloudX + cloudW && vy >= cloudY && vy <= cloudY + cloudH) {
+      if (vx >= cloudX && vx <= cloudX + cloudW && vy >= cloudY && vy <= cloudY + cloudH)
+    {
         
-        if (currentDrag.key != null && currentDrag.key.equals(cloudFoodKey) && pointAmount >= 1) {
+        if (currentDrag.key != null && currentDrag.key.equals(cloudFoodKey) && pointAmount >= 1)
+    {
           int price = getPriceForKey(currentDrag.key);
           moneyAmount += price;
           pointAmount -= 1;
+          SoundManager.playSellSound();
           
-          try {
-            java.util.List<String> unlocked = FoodEach.allUnlockedFood;
-            if (unlocked != null && !unlocked.isEmpty()) {
-              String newKey = unlocked.get(rand.nextInt(unlocked.size()));
-              cloudFoodKey = newKey;
-              Imagesfood f = new Imagesfood(newKey);
-              BufferedImage bi = f.getImage();
-              if (bi != null) {
-                cloudApple = f;
-                cloudAppleImage = bi;
-                showCloudApple = true;
-              }
-            }
-          } catch (Throwable t) {
-            
-          }
+          // Trigger customer exit animation
+          customer2ExitState = 1;
+          customer2ExitStartTime = System.currentTimeMillis();
+          showCloudApple = false;
+          cloudAppleImage = null;
         }
         
         activeDrags.remove(currentDrag);
@@ -569,10 +706,14 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
   }
 
   @Override
-  public void mouseEntered(MouseEvent e) { }
+  public void mouseEntered(MouseEvent e)
+  {
+  }
 
   @Override
-  public void mouseExited(MouseEvent e) { }
+  public void mouseExited(MouseEvent e)
+  {
+  }
     
   public int getMouseX()
   {
@@ -660,6 +801,9 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
   private boolean customer2AnimationPaused = false;
   private int customer2PausedFrameIndex = -1;
   
+  private int customer2ExitState = 0;
+  private long customer2ExitStartTime = 0L;
+  
   
   
   
@@ -693,24 +837,42 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
   private final java.util.Random rand = new java.util.Random();
 
   
-  public void onCorrectAnswer() {
+  public void onCorrectAnswer()
+    {
+    int coinsEarned = 5;
     
-    pointAmount += 1;
+    // Get difficulty from question panel and award coins accordingly
+    if (questionPanel != null)
+    {
+      String difficulty = questionPanel.getDifficulty();
+      if ("double".equals(difficulty))
+    {
+        coinsEarned = 10;
+      } else if ("triple".equals(difficulty))
+    {
+        coinsEarned = 20;
+      }
+    }
+    
+    pointAmount += coinsEarned;
     
     try {
       java.util.List<String> unlocked = FoodEach.allUnlockedFood;
-      if (unlocked != null && !unlocked.isEmpty()) {
+      if (unlocked != null && !unlocked.isEmpty())
+    {
         String key = unlocked.get(rand.nextInt(unlocked.size()));
         cloudFoodKey = key;  
         Imagesfood f = new Imagesfood(key);
         BufferedImage bi = f.getImage();
-        if (bi != null) {
+        if (bi != null)
+    {
           cloudApple = f;
           cloudAppleImage = bi;
           showCloudApple = true;
         }
       }
-    } catch (Throwable t) {
+    } catch (Throwable t)
+    {
       
     }
     repaint();
@@ -720,15 +882,18 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
   private final java.util.Map<BufferedImage, BufferedImage> grayscaleCache = new java.util.HashMap<>();
 
   
-  private BufferedImage toGray(BufferedImage src) {
+  private BufferedImage toGray(BufferedImage src)
+    {
     if (src == null) return null;
     BufferedImage cached = grayscaleCache.get(src);
     if (cached != null) return cached;
     int w = src.getWidth();
     int h = src.getHeight();
     BufferedImage gray = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
-    for (int y = 0; y < h; y++) {
-      for (int x = 0; x < w; x++) {
+    for (int y = 0; y < h; y++)
+    {
+      for (int x = 0; x < w; x++)
+    {
         int argb = src.getRGB(x, y);
         int a = (argb >> 24) & 0xff;
         int r = (argb >> 16) & 0xff;
@@ -744,11 +909,13 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
   }
 
   
-  private BufferedImage getImageForKey(BufferedImage img, String key) {
+  private BufferedImage getImageForKey(BufferedImage img, String key)
+    {
     if (img == null) return null;
     try {
       if (FoodEach.allUnlockedFood.contains(key)) return img;
-    } catch (Throwable t) {
+    } catch (Throwable t)
+    {
       
       return img;
     }
@@ -756,76 +923,94 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
   }
 
   
-  private int getPriceForKey(String key) {
+  private int getPriceForKey(String key)
+    {
     try {
       FoodEach fe = FoodEach.getByName(key);
       if (fe != null) return fe.getPrice();
-    } catch (Throwable t) {
+    } catch (Throwable t)
+    {
       
     }
     return 0;
   }
 
   
-  private boolean isFoodUnlocked(String key) {
+  private boolean isFoodUnlocked(String key)
+    {
     try {
       return FoodEach.allUnlockedFood.contains(key);
-    } catch (Throwable t) {
+    } catch (Throwable t)
+    {
       return false;
     }
   }
 
   
-  private int getUnlockCostForKey(String key) {
+  private int getUnlockCostForKey(String key)
+    {
     try {
       FoodEach fe = FoodEach.getByName(key);
       if (fe != null) return fe.getReqMoney();
-    } catch (Throwable t) {
+    } catch (Throwable t)
+    {
       
     }
     return 0;
   }
 
   
-  private void attemptUnlock(String key) {
+  private void attemptUnlock(String key)
+    {
     try {
       FoodEach fe = FoodEach.getByName(key);
-      if (fe != null) {
+      if (fe != null)
+    {
         int cost = fe.getReqMoney();
-        if (moneyAmount >= cost) {
+        if (moneyAmount >= cost)
+    {
           
-          if (fe.unlock(moneyAmount)) {
+          if (fe.unlock(moneyAmount))
+    {
             
             moneyAmount -= cost;
             repaint();
           }
         }
       }
-    } catch (Throwable t) {
+    } catch (Throwable t)
+    {
       
     }
   }
 
-  private void consumePointOnClick() {
+  private void consumePointOnClick()
+    {
     if (pointAmount > 0) pointAmount -= 0;
+    SoundManager.playClickSound();
     repaint();
   }
 
-  private String getInventoryNumberLabel(String key) {
+  private String getInventoryNumberLabel(String key)
+    {
     try {
-      if (isFoodUnlocked(key)) {
+      if (isFoodUnlocked(key))
+    {
         return Integer.toString(getPriceForKey(key)) + "$";
       } else {
         return Integer.toString(getUnlockCostForKey(key)) + "p";
       }
-    } catch (Throwable t) {
+    } catch (Throwable t)
+    {
       return "0p";
     }
   }
 
   
-  private void removeInventoryImageForKey(String key) {
-    switch (key) {
+  private void removeInventoryImageForKey(String key)
+    {
+    switch (key)
+    {
       case "apple": appleImage = null; break;
       case "apple_pie": apple_pieImage = null; break;
       case "avocado": avocadoImage = null; break;
@@ -865,7 +1050,8 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
     int vx, vy, vW, vH;
     int offsetX, offsetY;
     String key;  
-    DragItem(BufferedImage img, int vx, int vy, int vW, int vH, String key) {
+    DragItem(BufferedImage img, int vx, int vy, int vW, int vH, String key)
+    {
       this.img = img; this.vx = vx; this.vy = vy; this.vW = vW; this.vH = vH; this.offsetX = 0; this.offsetY = 0; this.key = key;
     }
   }
@@ -902,7 +1088,8 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       drawVirtualImage(g, storeImageOriginal, 0, 0, VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
     }
     
-    if (showInventory) {
+    if (showInventory)
+    {
     
     Graphics2D g2Measure = (Graphics2D) g;
     Font originalFont = g2Measure.getFont();
@@ -915,7 +1102,8 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
                           "Cheesecake", "Chicken", "Cookie", "Dragon Fruit", "Fish", "Fried Eggs",
                           "Honey", "Pineapple", "Pretzel", "Pumpkin Pie", "Shrimp", "Sushi", "T-Bone", "Watermelon"};
     int maxTextWidth = 0;
-    for (String name : foodNames) {
+    for (String name : foodNames)
+    {
       int textWidth = fm.stringWidth(name);
       maxTextWidth = Math.max(maxTextWidth, textWidth);
     }
@@ -956,7 +1144,8 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       int imgX = leftX;
       int imgY = startY + row * rowSpacing;
       drawVirtualImage(g, getImageForKey(appleImage, "apple"), imgX, imgY, V_IMG_W, V_IMG_H);
-      if (isFoodUnlocked("apple")) {
+      if (isFoodUnlocked("apple"))
+    {
         drawVirtualString(g, "Apple " + getPriceForKey("apple") + "$", imgX + V_IMG_W + 8, imgY + 30);
       } else {
         drawVirtualString(g, "Apple - " + getUnlockCostForKey("apple") + "p", imgX + V_IMG_W + 8, imgY + 30);
@@ -968,7 +1157,8 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       int imgX = rightX;
       int imgY = startY + row * rowSpacing;
       drawVirtualImage(g, getImageForKey(apple_pieImage, "apple_pie"), imgX, imgY, V_IMG_W, V_IMG_H);
-      if (isFoodUnlocked("apple_pie")) {
+      if (isFoodUnlocked("apple_pie"))
+    {
         drawVirtualString(g, "Apple Pie " + getPriceForKey("apple_pie") + "$", imgX + V_IMG_W + 8, imgY + 35);
       } else {
         drawVirtualString(g, "Apple Pie - " + getUnlockCostForKey("apple_pie") + "p", imgX + V_IMG_W + 8, imgY + 35);
@@ -980,7 +1170,8 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       int imgX = leftX;
       int imgY = startY + row * rowSpacing;
       drawVirtualImage(g, getImageForKey(avocadoImage, "avocado"), imgX, imgY, V_IMG_W, V_IMG_H);
-      if (isFoodUnlocked("avocado")) {
+      if (isFoodUnlocked("avocado"))
+    {
         drawVirtualString(g, "Avocado " + getPriceForKey("avocado") + "$", imgX + V_IMG_W + 8, imgY + 35);
       } else {
         drawVirtualString(g, "Avocado - " + getUnlockCostForKey("avocado") + "p", imgX + V_IMG_W + 8, imgY + 35);
@@ -992,7 +1183,8 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       int imgX = rightX;
       int imgY = startY + row * rowSpacing;
       drawVirtualImage(g, getImageForKey(boar_headImage, "boar_head"), imgX, imgY, V_IMG_W, V_IMG_H);
-      if (isFoodUnlocked("boar_head")) {
+      if (isFoodUnlocked("boar_head"))
+    {
         drawVirtualString(g, "Boar Head " + getPriceForKey("boar_head") + "$", imgX + V_IMG_W + 8, imgY + 35);
       } else {
         drawVirtualString(g, "Boar Head - " + getUnlockCostForKey("boar_head") + "p", imgX + V_IMG_W + 8, imgY + 35);
@@ -1004,7 +1196,8 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       int imgX = leftX;
       int imgY = startY + row * rowSpacing;
       drawVirtualImage(g, getImageForKey(breadImage, "bread"), imgX, imgY, V_IMG_W, V_IMG_H);
-      if (isFoodUnlocked("bread")) {
+      if (isFoodUnlocked("bread"))
+    {
         drawVirtualString(g, "Bread " + getPriceForKey("bread") + "$", imgX + V_IMG_W + 8, imgY + 35);
       } else {
         drawVirtualString(g, "Bread - " + getUnlockCostForKey("bread") + "p", imgX + V_IMG_W + 8, imgY + 35);
@@ -1016,7 +1209,8 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       int imgX = rightX;
       int imgY = startY + row * rowSpacing;
       drawVirtualImage(g, getImageForKey(cheeseImage, "cheese"), imgX, imgY, V_IMG_W, V_IMG_H);
-      if (isFoodUnlocked("cheese")) {
+      if (isFoodUnlocked("cheese"))
+    {
         drawVirtualString(g, "Cheese " + getPriceForKey("cheese") + "$", imgX + V_IMG_W + 8, imgY + 35);
       } else {
         drawVirtualString(g, "Cheese - " + getUnlockCostForKey("cheese") + "p", imgX + V_IMG_W + 8, imgY + 35);
@@ -1028,7 +1222,8 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       int imgX = leftX;
       int imgY = startY + row * rowSpacing;
       drawVirtualImage(g, getImageForKey(cheesecakeImage, "cheesecake"), imgX, imgY, V_IMG_W, V_IMG_H);
-      if (isFoodUnlocked("cheesecake")) {
+      if (isFoodUnlocked("cheesecake"))
+    {
         drawVirtualString(g, "Cheesecake " + getPriceForKey("cheesecake") + "$", imgX + V_IMG_W + 8, imgY + 35);
       } else {
         drawVirtualString(g, "Cheesecake - " + getUnlockCostForKey("cheesecake") + "p", imgX + V_IMG_W + 8, imgY + 35);
@@ -1040,7 +1235,8 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       int imgX = rightX;
       int imgY = startY + row * rowSpacing;
       drawVirtualImage(g, getImageForKey(chickenImage, "chicken"), imgX, imgY, V_IMG_W, V_IMG_H);
-      if (isFoodUnlocked("chicken")) {
+      if (isFoodUnlocked("chicken"))
+    {
         drawVirtualString(g, "Chicken " + getPriceForKey("chicken") + "$", imgX + V_IMG_W + 8, imgY + 35);
       } else {
         drawVirtualString(g, "Chicken - " + getUnlockCostForKey("chicken") + "p", imgX + V_IMG_W + 8, imgY + 35);
@@ -1052,7 +1248,8 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       int imgX = leftX;
       int imgY = startY + row * rowSpacing;
       drawVirtualImage(g, getImageForKey(cookieImage, "cookie"), imgX, imgY, V_IMG_W, V_IMG_H);
-      if (isFoodUnlocked("cookie")) {
+      if (isFoodUnlocked("cookie"))
+    {
         drawVirtualString(g, "Cookie " + getPriceForKey("cookie") + "$", imgX + V_IMG_W + 8, imgY + 35);
       } else {
         drawVirtualString(g, "Cookie - " + getUnlockCostForKey("cookie") + "p", imgX + V_IMG_W + 8, imgY + 35);
@@ -1064,7 +1261,8 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       int imgX = rightX;
       int imgY = startY + row * rowSpacing;
       drawVirtualImage(g, getImageForKey(dragon_fruitImage, "dragon_fruit"), imgX, imgY, V_IMG_W, V_IMG_H);
-      if (isFoodUnlocked("dragon_fruit")) {
+      if (isFoodUnlocked("dragon_fruit"))
+    {
         drawVirtualString(g, "Dragon Fruit " + getPriceForKey("dragon_fruit") + "$", imgX + V_IMG_W + 8, imgY + 35);
       } else {
         drawVirtualString(g, "Dragon Fruit - " + getUnlockCostForKey("dragon_fruit") + "p", imgX + V_IMG_W + 8, imgY + 35);
@@ -1077,7 +1275,8 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       int imgX = leftX;
       int imgY = startY + row * rowSpacing;
       drawVirtualImage(g, getImageForKey(fishImage, "fish"), imgX, imgY, V_IMG_W, V_IMG_H);
-      if (isFoodUnlocked("fish")) {
+      if (isFoodUnlocked("fish"))
+    {
         drawVirtualString(g, "Fish " + getPriceForKey("fish") + "$", imgX + V_IMG_W + 8, imgY + 35);
       } else {
         drawVirtualString(g, "Fish - " + getUnlockCostForKey("fish") + "p", imgX + V_IMG_W + 8, imgY + 35);
@@ -1090,7 +1289,8 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       int imgX = rightX;
       int imgY = startY + row * rowSpacing;
       drawVirtualImage(g, getImageForKey(fried_eggsImage, "fried_eggs"), imgX, imgY, V_IMG_W, V_IMG_H);
-      if (isFoodUnlocked("fried_eggs")) {
+      if (isFoodUnlocked("fried_eggs"))
+    {
         drawVirtualString(g, "Fried Eggs " + getPriceForKey("fried_eggs") + "$", imgX + V_IMG_W + 8, imgY + 35);
       } else {
         drawVirtualString(g, "Fried Eggs - " + getUnlockCostForKey("fried_eggs") + "p", imgX + V_IMG_W + 8, imgY + 35);
@@ -1103,7 +1303,8 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       int imgX = leftX;
       int imgY = startY + row * rowSpacing;
       drawVirtualImage(g, getImageForKey(honeyImage, "honey"), imgX, imgY, V_IMG_W, V_IMG_H);
-      if (isFoodUnlocked("honey")) {
+      if (isFoodUnlocked("honey"))
+    {
         drawVirtualString(g, "Honey " + getPriceForKey("honey") + "$", imgX + V_IMG_W + 8, imgY + 35);
       } else {
         drawVirtualString(g, "Honey - " + getUnlockCostForKey("honey") + "p", imgX + V_IMG_W + 8, imgY + 35);
@@ -1116,7 +1317,8 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       int imgX = rightX;
       int imgY = startY + row * rowSpacing;
       drawVirtualImage(g, getImageForKey(pineappleImage, "pineapple"), imgX, imgY, V_IMG_W, V_IMG_H);
-      if (isFoodUnlocked("pineapple")) {
+      if (isFoodUnlocked("pineapple"))
+    {
         drawVirtualString(g, "Pineapple " + getPriceForKey("pineapple") + "$", imgX + V_IMG_W + 8, imgY + 35);
       } else {
         drawVirtualString(g, "Pineapple - " + getUnlockCostForKey("pineapple") + "p", imgX + V_IMG_W + 8, imgY + 35);
@@ -1129,7 +1331,8 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       int imgX = leftX;
       int imgY = startY + row * rowSpacing;
       drawVirtualImage(g, getImageForKey(pretzelImage, "pretzel"), imgX, imgY, V_IMG_W, V_IMG_H);
-      if (isFoodUnlocked("pretzel")) {
+      if (isFoodUnlocked("pretzel"))
+    {
         drawVirtualString(g, "Pretzel " + getPriceForKey("pretzel") + "$", imgX + V_IMG_W + 8, imgY + 35);
       } else {
         drawVirtualString(g, "Pretzel - " + getUnlockCostForKey("pretzel") + "p", imgX + V_IMG_W + 8, imgY + 35);
@@ -1142,7 +1345,8 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       int imgX = rightX;
       int imgY = startY + row * rowSpacing;
       drawVirtualImage(g, getImageForKey(pumpkin_pieImage, "pumpkin_pie"), imgX, imgY, V_IMG_W, V_IMG_H);
-      if (isFoodUnlocked("pumpkin_pie")) {
+      if (isFoodUnlocked("pumpkin_pie"))
+    {
         drawVirtualString(g, "Pumpkin Pie " + getPriceForKey("pumpkin_pie") + "$", imgX + V_IMG_W + 8, imgY + 35);
       } else {
         drawVirtualString(g, "Pumpkin Pie - " + getUnlockCostForKey("pumpkin_pie") + "p", imgX + V_IMG_W + 8, imgY + 35);
@@ -1155,7 +1359,8 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       int imgX = leftX;
       int imgY = startY + row * rowSpacing;
       drawVirtualImage(g, getImageForKey(shrimpImage, "shrimp"), imgX, imgY, V_IMG_W, V_IMG_H);
-      if (isFoodUnlocked("shrimp")) {
+      if (isFoodUnlocked("shrimp"))
+    {
         drawVirtualString(g, "Shrimp " + getPriceForKey("shrimp") + "$", imgX + V_IMG_W + 8, imgY + 35);
       } else {
         drawVirtualString(g, "Shrimp - " + getUnlockCostForKey("shrimp") + "p", imgX + V_IMG_W + 8, imgY + 35);
@@ -1168,7 +1373,8 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       int imgX = rightX;
       int imgY = startY + row * rowSpacing;
       drawVirtualImage(g, getImageForKey(sushiImage, "sushi"), imgX, imgY, V_IMG_W, V_IMG_H);
-      if (isFoodUnlocked("sushi")) {
+      if (isFoodUnlocked("sushi"))
+    {
         drawVirtualString(g, "Sushi " + getPriceForKey("sushi") + "$", imgX + V_IMG_W + 8, imgY + 35);
       } else {
         drawVirtualString(g, "Sushi - " + getUnlockCostForKey("sushi") + "p", imgX + V_IMG_W + 8, imgY + 35);
@@ -1181,7 +1387,8 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       int imgX = leftX;
       int imgY = startY + row * rowSpacing;
       drawVirtualImage(g, getImageForKey(tboneImage, "t-bone"), imgX, imgY, V_IMG_W, V_IMG_H);
-      if (isFoodUnlocked("t-bone")) {
+      if (isFoodUnlocked("t-bone"))
+    {
         drawVirtualString(g, "T-Bone " + getPriceForKey("t-bone") + "$", imgX + V_IMG_W + 8, imgY + 35);
       } else {
         drawVirtualString(g, "T-Bone - " + getUnlockCostForKey("t-bone") + "p", imgX + V_IMG_W + 8, imgY + 35);
@@ -1194,7 +1401,8 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       int imgX = rightX;
       int imgY = startY + row * rowSpacing;
       drawVirtualImage(g, getImageForKey(watermelonImage, "watermelon"), imgX, imgY, V_IMG_W, V_IMG_H);
-      if (isFoodUnlocked("watermelon")) {
+      if (isFoodUnlocked("watermelon"))
+    {
         drawVirtualString(g, "Watermelon " + getPriceForKey("watermelon") + "$", imgX + V_IMG_W + 8, imgY + 35);
       } else {
         drawVirtualString(g, "Watermelon - " + getUnlockCostForKey("watermelon") + "p", imgX + V_IMG_W + 8, imgY + 35);
@@ -1222,7 +1430,8 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       final int V_W = 250;
       final int V_H = 250;
       
-      if (customer2State == 2) {
+      if (customer2State == 2)
+    {
         drawVirtualImage(g, customer2Image, (int)Math.round(customer2Vx), (int)Math.round(customer2Vy), V_W, V_H);
         
         
@@ -1233,11 +1442,14 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       int ah = Math.max(1, (int) Math.round(V_H * scale));
 
       BufferedImage frameToDraw = null;
-      if (!customer2FramesOriginal.isEmpty()) {
+      if (!customer2FramesOriginal.isEmpty())
+    {
         
-        if (customer2FramesScaled.size() != customer2FramesOriginal.size() || lastCustomer2ScaledW != aw || lastCustomer2ScaledH != ah) {
+        if (customer2FramesScaled.size() != customer2FramesOriginal.size() || lastCustomer2ScaledW != aw || lastCustomer2ScaledH != ah)
+    {
           customer2FramesScaled.clear();
-          for (BufferedImage orig : customer2FramesOriginal) {
+          for (BufferedImage orig : customer2FramesOriginal)
+    {
             BufferedImage scaled = getScaledImage(orig, aw, ah);
             customer2FramesScaled.add(scaled);
           }
@@ -1245,9 +1457,11 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
           lastCustomer2ScaledH = ah;
         }
 
-        if (!customer2FramesScaled.isEmpty()) {
+        if (!customer2FramesScaled.isEmpty())
+    {
           long now = System.currentTimeMillis();
-          if (customer2AnimationPaused && customer2PausedFrameIndex >= 0) {
+          if (customer2AnimationPaused && customer2PausedFrameIndex >= 0)
+    {
             int safe = Math.max(0, Math.min(customer2PausedFrameIndex, customer2FramesScaled.size()-1));
             frameToDraw = customer2FramesScaled.get(safe);
           } else {
@@ -1260,7 +1474,8 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       }
 
         
-        if (frameToDraw == null) {
+        if (frameToDraw == null)
+    {
           drawVirtualImage(g, customer2Image, 750 + uiShiftX, 400 + uiShiftY, V_W, V_H);
         } else {
           
@@ -1274,12 +1489,12 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
     } else {
       
     }
-    if (cloudImage != null)
+    if (cloudImage != null && customer2Visible && customer2State == 2 && customer2ExitState == 0)
     {
       
       drawVirtualImage(g, cloudImage, 1300 + uiShiftX, 460 + uiShiftY, 100, 100);
     }
-    if (cloudAppleImage != null)
+    if (cloudAppleImage != null && customer2Visible && customer2State == 2 && customer2ExitState == 0)
     {
       
       drawVirtualImage(g, cloudAppleImage, 1336 + uiShiftX, 500 + uiShiftY, 30, 30);
@@ -1288,7 +1503,7 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
     if (questionImage != null)
     {
       
-      drawVirtualImage(g, questionImage, 800, 75, 150, 150);
+      drawVirtualImage(g, questionImage, 800, 15, 150, 150);
     }
 
     if (pointImage != null)
@@ -1307,8 +1522,10 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
     }
 
     
-    if (!activeDrags.isEmpty()) {
-      for (DragItem d : activeDrags) {
+    if (!activeDrags.isEmpty())
+    {
+      for (DragItem d : activeDrags)
+    {
         if (d != null && d.img != null) drawVirtualImage(g, d.img, d.vx, d.vy, d.vW, d.vH);
       }
     }
@@ -1330,7 +1547,8 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       g2coords.drawString(coords, 10, 18);
       g2coords.setFont(oldF);
       g2coords.setColor(oldC);
-    } catch (Throwable t) {
+    } catch (Throwable t)
+    {
       
     }
 
@@ -1435,7 +1653,8 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
     g2.setColor(oldColor);
   }
 
-    private BufferedImage getScaledImage(BufferedImage src, int targetW, int targetH) {
+    private BufferedImage getScaledImage(BufferedImage src, int targetW, int targetH)
+    {
         if (src == null) return null;
         BufferedImage resized = new BufferedImage(targetW, targetH, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2 = resized.createGraphics();
@@ -1448,7 +1667,8 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
     }
 
 
-    public static void main(String[] args) {
+    public static void main(String[] args)
+    {
         SwingUtilities.invokeLater(() -> {
             JFrame frame = new JFrame("Stoe Simulator");
             Main panel = new Main();
@@ -1575,12 +1795,14 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
                   
                   new Thread(() -> {
                     java.util.List<BufferedImage> loaded = new java.util.ArrayList<>();
-                    for (int i = 1; i <= 10; i++) {
+                    for (int i = 1; i <= 10; i++)
+    {
                       Imagesfood f = new Imagesfood("customer2_walking/" + i);
                       BufferedImage bi = f.getImage();
                       if (bi != null) loaded.add(bi);
                     }
-                    if (!loaded.isEmpty()) {
+                    if (!loaded.isEmpty())
+    {
                       
                       SwingUtilities.invokeLater(() -> {
                         panel.customer2FramesOriginal.clear();
