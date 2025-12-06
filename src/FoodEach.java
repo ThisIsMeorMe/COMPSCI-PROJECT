@@ -10,47 +10,58 @@ public class FoodEach
   public static ArrayList<String> allUnlockedFood = new ArrayList<String>();
   
   public static java.util.Map<String, FoodEach> registry = new java.util.HashMap<>();
-  public FoodEach(String n, int p, int r, boolean u) {
+  public FoodEach(String n, int p, int r, boolean u)
+  {
     name = n;
     price = p;
     reqMoney = r;
     unlocked = u;
-    if (u) {
+    if (u)
+    {
       allUnlockedFood.add(n);
     }
     registry.put(n, this);
   }
-  public String getName() {
+  public String getName()
+  {
     return name;
   }
-  public int getPrice() {
+  public int getPrice()
+  {
     return price;
   }
-  public int getReqMoney() {
+  public int getReqMoney()
+  {
     return reqMoney;
   }
-  public boolean getUnlocked() {
+  public boolean getUnlocked()
+  {
     return unlocked;
   }
-  public boolean unlock(int money) {
-    
-    if (unlocked) {
+  public boolean unlock(int money)
+  {
+    if (unlocked)
+    {
       return false;
     }
-    if (money >= reqMoney) {
+    if (money >= reqMoney)
+    {
       unlocked = true;
       allUnlockedFood.add(this.name);
       return true;
-    } else {
+    }
+    else
+    {
       return false;
     }
   }
-  public boolean buy(int money) {
-    
+  public boolean buy(int money)
+  {
     return money >= price;
   }
 
-  public static FoodEach getByName(String n) {
+  public static FoodEach getByName(String n)
+  {
     return registry.get(n);
   }
 
