@@ -1,6 +1,7 @@
-public class Driver {
-    
-    public Driver() {
+public class Driver
+{
+    public Driver()
+    {
         new FoodEach("apple", 3, 0, true);
         new FoodEach("apple_pie", 5, 10, false);
         new FoodEach("avocado", 10, 25, false);
