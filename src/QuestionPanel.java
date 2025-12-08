@@ -33,19 +33,19 @@ public class QuestionPanel extends JPanel
         difficultyLabel.setHorizontalAlignment(SwingConstants.CENTER);
         this.add(difficultyLabel);
 
-        singleButton = new JButton("Single ∫");
+        singleButton = new JButton("Derivatives");
         singleButton.setBounds(100, 150, 150, 60);
         singleButton.setFont(new Font("Arial", Font.BOLD, 18));
         singleButton.addActionListener(e -> selectDifficulty("single"));
         this.add(singleButton);
 
-        doubleButton = new JButton("Double ∫∫");
+        doubleButton = new JButton("Single ∫");
         doubleButton.setBounds(325, 150, 150, 60);
         doubleButton.setFont(new Font("Arial", Font.BOLD, 18));
         doubleButton.addActionListener(e -> selectDifficulty("double"));
         this.add(doubleButton);
 
-        tripleButton = new JButton("Triple ∫∫∫");
+        tripleButton = new JButton("Double ∫∫");
         tripleButton.setBounds(550, 150, 150, 60);
         tripleButton.setFont(new Font("Arial", Font.BOLD, 18));
         tripleButton.addActionListener(e -> selectDifficulty("triple"));
@@ -130,6 +130,19 @@ public class QuestionPanel extends JPanel
 
         if ("single".equals(difficulty))
         {
+            a = rand.nextInt(8) + 1;
+            b = rand.nextInt(10) - 5;
+            int c = rand.nextInt(10) - 5;
+            int x_val = rand.nextInt(10) - 5;
+
+            integrandLabel.setText(String.format("d/dx [%dx³ + %dx² + %dx + 5]", a, b, c));
+            boundsLabel.setText(String.format("at x = %d", x_val));
+            
+            correctAnswer = 3 * a * x_val * x_val + 2 * b * x_val + c;
+
+        }
+        else if ("double".equals(difficulty))
+        {
             a = rand.nextInt(10) + 1;
             b = rand.nextInt(20) - 10;
             int c_lower = rand.nextInt(5);
@@ -143,7 +156,7 @@ public class QuestionPanel extends JPanel
             correctAnswer = upper - lower;
 
         }
-        else if ("double".equals(difficulty))
+        else if ("triple".equals(difficulty))
         {
             a = rand.nextInt(5) + 1;
             b = rand.nextInt(5) + 1;
@@ -170,70 +183,6 @@ public class QuestionPanel extends JPanel
 
             correctAnswer = antid.applyAsDouble(X2) - antid.applyAsDouble(X1);
 
-        }
-        else if ("triple".equals(difficulty))
-        {
-            int A = rand.nextInt(3) + 1;
-            int B = rand.nextInt(3) + 1;
-            int C = rand.nextInt(3) + 1;
-            int D = rand.nextInt(3);
-            int E = rand.nextInt(3);
-            int F = rand.nextInt(3);
-            int G = rand.nextInt(2);
-
-            int X1 = rand.nextInt(2);
-            int X2 = X1 + rand.nextInt(3) + 2;
-
-            int y1 = rand.nextInt(3);
-            int y2 = y1 + rand.nextInt(3) + 1;
-            int z1 = rand.nextInt(2);
-            int z2 = z1 + rand.nextInt(3) + 1;
-
-            integrandLabel.setText(String.format("∫∫∫ (%dx + %dy + %dz + %d x y + %d y z + %d x z + %d x y z) dz dy dx", A, B, C, D, E, F, G));
-            boundsLabel.setText(String.format("x:[%d,%d]   y:[%d,%d]   z:[%d,%d]", X1, X2, y1, y2, z1, z2));
-
-            double deltaZ = (double) (z2 - z1);
-            double z2sq_minus_z1sq = (double) (z2 * z2 - z1 * z1);
-
-            int maxDeg = 5;
-            double[][] coeff = new double[maxDeg][maxDeg];
-
-            coeff[1][0] += A * deltaZ;
-            coeff[0][1] += B * deltaZ;
-            coeff[1][1] += D * deltaZ;
-
-            double half = 0.5;
-            coeff[0][0] += C * half * z2sq_minus_z1sq;
-            coeff[0][1] += E * half * z2sq_minus_z1sq;
-            coeff[1][0] += F * half * z2sq_minus_z1sq;
-            coeff[1][1] += G * half * z2sq_minus_z1sq;
-
-            int maxXdeg = 10;
-            double[] polyX = new double[maxXdeg];
-
-            for (int i = 0; i < coeff.length; i++)
-            {
-                for (int j = 0; j < coeff[i].length; j++)
-                {
-                    double cij = coeff[i][j];
-                    if (Math.abs(cij) < 1e-15) continue;
-                    int power = j + 1;
-                    double yIntegral = (Math.pow(y2, power) - Math.pow(y1, power)) / (double) power;
-                    int deg = i;
-                    if (deg >= polyX.length) continue;
-                    polyX[deg] += cij * yIntegral;
-                }
-            }
-
-            double result = 0.0;
-            for (int k = 0; k < polyX.length; k++)
-            {
-                double c = polyX[k];
-                if (Math.abs(c) < 1e-15) continue;
-                double factor = c / (k + 1);
-                result += factor * (Math.pow(X2, k + 1) - Math.pow(X1, k + 1));
-            }
-            correctAnswer = result;
         }
 
         double rounded3 = Math.round(correctAnswer * 1000.0) / 1000.0;
@@ -318,20 +267,8 @@ public class QuestionPanel extends JPanel
             }
             else
             {
-                feedbackLabel.setFont(new Font("Arial", Font.PLAIN, 60));
-                double rounded = Math.rint(correctAnswer);
-                String exactStr = String.format("%.6f", correctAnswer);
-                String roundedStr;
-                if (Math.abs(correctAnswer - rounded) < 1e-9)
-                {
-                    roundedStr = String.valueOf((long) rounded);
-                }
-                else
-                {
-                    roundedStr = String.format("%.3f", correctAnswer);
-                }
-                double diff = Math.abs(userAnswer - correctAnswer);
-                feedbackLabel.setText("Incorrect! Answer was: " + roundedStr + " (exact: " + exactStr + ", diff: " + String.format("%.6f", diff) + ")");
+                feedbackLabel.setFont(new Font("Arial", Font.BOLD, 36));
+                feedbackLabel.setText("WRONG");
                 feedbackLabel.setForeground(Color.RED);
             }
 
