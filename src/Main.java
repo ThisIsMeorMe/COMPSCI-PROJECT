@@ -848,6 +848,10 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
   private int lastScaledW = -1;
   private int lastScaledH = -1;
   private Imagesfood store;
+  private BufferedImage introImage = null;
+  private boolean showIntro = false;
+  private long introStartMillis = 0L;
+  private int introDurationMs = 3000; // milliseconds
   private BufferedImage shoppingcartImage = null;
   private Imagesfood shoppingcart;
   private BufferedImage cursorImage = null;
@@ -1154,8 +1158,28 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
     
     
     g.setColor(Color.BLACK);
-    
+
     g.fillRect(0, 0, getWidth(), getHeight());
+
+    // If an intro image is configured, draw it fullscreen (cover) for the intro duration
+    if (showIntro && introImage != null)
+    {
+      int panelW = getWidth();
+      int panelH = getHeight();
+      int iw = introImage.getWidth();
+      int ih = introImage.getHeight();
+      double scaleCover = Math.max((double) panelW / Math.max(1, iw), (double) panelH / Math.max(1, ih));
+      int drawW = Math.max(1, (int) Math.round(iw * scaleCover));
+      int drawH = Math.max(1, (int) Math.round(ih * scaleCover));
+      int dx = (panelW - drawW) / 2;
+      int dy = (panelH - drawH) / 2;
+      g.drawImage(introImage, dx, dy, drawW, drawH, this);
+      // check elapsed and hide intro when time's up
+      long now = System.currentTimeMillis();
+      if (introStartMillis <= 0) introStartMillis = now;
+      if (now - introStartMillis >= introDurationMs) showIntro = false;
+      return; // while intro is visible we don't draw the rest of UI
+    }
 
     
     
@@ -1856,6 +1880,19 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
             panel.pointImage = panel.point.getImage();
             panel.money = new Imagesfood("money");
             panel.moneyImage = panel.money.getImage();
+
+            // load intro image and show it for introDurationMs at startup
+            panel.introImage = new Imagesfood("intro").getImage();
+            panel.showIntro = (panel.introImage != null);
+            if (panel.showIntro)
+            {
+              panel.introStartMillis = System.currentTimeMillis();
+              new javax.swing.Timer(panel.introDurationMs, ev -> {
+                panel.showIntro = false;
+                panel.repaint();
+                ((javax.swing.Timer) ev.getSource()).stop();
+              }).start();
+            }
 
             
             panel.pointAmount = 0;
