@@ -44,9 +44,9 @@ public class SoundManager
 
             String[][] commands =
             {
-                {"pw-play", soundFile.getAbsolutePath()},
-                {"mpg123", "-q", soundFile.getAbsolutePath()},
+                {"powershell", "-c", "[System.Media.SoundPlayer]::new('" + soundFile.getAbsolutePath() + "').PlayLooping()"},
                 {"ffplay", "-nodisp", "-autoexit", "-loop", "0", soundFile.getAbsolutePath()},
+                {"mpg123", "-q", soundFile.getAbsolutePath()},
                 {"paplay", soundFile.getAbsolutePath()}
             };
 
@@ -99,9 +99,9 @@ public class SoundManager
 
                 String[][] commands =
                 {
-                    {"pw-play", soundFile.getAbsolutePath()},
-                    {"mpg123", "-q", soundFile.getAbsolutePath()},
+                    {"powershell", "-c", "[System.Media.SoundPlayer]::new('" + soundFile.getAbsolutePath() + "').PlaySync()"},
                     {"ffplay", "-nodisp", "-autoexit", soundFile.getAbsolutePath()},
+                    {"mpg123", "-q", soundFile.getAbsolutePath()},
                     {"paplay", soundFile.getAbsolutePath()}
                 };
 
