@@ -48,10 +48,13 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
         customer2Vx = customer2TurnStartX + customer2TurnOffsetX * frac;
         customer2AnimationPaused = false;
         customer2PausedFrameIndex = -1;
-        customer2FacingRight = (customer2TurnOffsetX > 0);
+        customer2LastHorizontalDir = (customer2TurnOffsetX > 0) ? 1 : -1;
+        customer2FacingRight = customer2LastHorizontalDir > 0;
         if (elapsed >= customer2TurnDurationMs)
         {
           customer2Turning = false;
+          customer2LastHorizontalDir = 1;
+          customer2FacingRight = true;
         }
       }
       else
@@ -87,7 +90,8 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
         
         customer2 = new Imagesfood(idlePrefix + "/1");
         customer2Image = customer2.getImage();
-        customer2FacingRight = false;
+        customer2LastHorizontalDir = 1;
+        customer2FacingRight = true;
         customer2Turning = false;
         customer2TurningStartMillis = 0L;
         
@@ -171,6 +175,7 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
           customer2VerticalMovementAccum = 0L;
           customer2AnimationPaused = false;
           customer2PausedFrameIndex = -1;
+          customer2FacingRight = customer2LastHorizontalDir > 0;
         }
         if (customer2Vy <= finalY)
         {
@@ -220,7 +225,8 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
         double deltaX = customer2Vx - lastCustomer2Vx;
         if (Math.abs(deltaX) > 0.5)
         {
-          customer2FacingRight = deltaX > 0.0;
+          customer2LastHorizontalDir = deltaX > 0.0 ? 1 : -1;
+          customer2FacingRight = customer2LastHorizontalDir > 0;
         }
       }
     }
@@ -761,6 +767,8 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
           customer2AnimStartMillis = System.currentTimeMillis();
           showCloudApple = false;
           cloudAppleImage = null;
+          customer2LastHorizontalDir = -1;
+          customer2FacingRight = false;
         }
         
         activeDrags.remove(currentDrag);
@@ -880,6 +888,7 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
   private double customer2TurnOffsetX = -60.0;
   private double customer2TurnStartX = 0.0;
   private boolean customer2FacingRight = false;
+  private int customer2LastHorizontalDir = 1;
   private double lastCustomer2Vx = Double.NaN;
   
   
@@ -1509,9 +1518,27 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       
       if (customer2State == 2 && customer2ExitState == 0)
     {
-        drawVirtualImage(g, customer2Image, (int)Math.round(customer2Vx), (int)Math.round(customer2Vy), V_W, V_H);
-        
-        
+        int panelW_local = getWidth();
+        int panelH_local = getHeight();
+        double scale_local = Math.min((double) panelW_local / VIRTUAL_WIDTH, (double) panelH_local / VIRTUAL_HEIGHT);
+        int offsetX_local = (int) Math.round((panelW_local - VIRTUAL_WIDTH * scale_local) / 2.0);
+        int offsetY_local = (int) Math.round((panelH_local - VIRTUAL_HEIGHT * scale_local) / 2.0);
+        int ax_local = offsetX_local + (int) Math.round(customer2Vx * scale_local);
+        int ay_local = offsetY_local + (int) Math.round(customer2Vy * scale_local);
+        int aw_local = Math.max(1, (int) Math.round(V_W * scale_local));
+        int ah_local = Math.max(1, (int) Math.round(V_H * scale_local));
+        if (!customer2FacingRight)
+        {
+          Graphics2D g2 = (Graphics2D) g;
+          java.awt.geom.AffineTransform at = new java.awt.geom.AffineTransform();
+          at.translate(ax_local + aw_local, ay_local);
+          at.scale(-1.0, 1.0);
+          g2.drawImage(customer2Image, at, null);
+        }
+        else
+        {
+          g.drawImage(customer2Image, ax_local, ay_local, aw_local, ah_local, this);
+        }
       } else {
       
       
@@ -1560,7 +1587,7 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
           int offsetY_local = (int) Math.round((panelH - VIRTUAL_HEIGHT * scale) / 2.0);
           int ax = offsetX_local + (int) Math.round(customer2Vx * scale);
           int ay = offsetY_local + (int) Math.round(customer2Vy * scale);
-          if (customer2FacingRight)
+          if (!customer2FacingRight)
           {
             Graphics2D g2 = (Graphics2D) g;
             java.awt.geom.AffineTransform at = new java.awt.geom.AffineTransform();
