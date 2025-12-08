@@ -41,15 +41,31 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
     lastUpdateMillis = now;
     if (customer2ExitState == 1)
     {
-      double dy = customer2Speed * dt;
-      customer2Vy += dy;
-
-      if (customer2Vy >= 961)
+      if (customer2Turning)
       {
-        customer2Vy = 961;
-        customer2ExitState = 2;
-        customer2ExitStartTime = now;
-        customer2Visible = false;
+        long elapsed = now - customer2TurningStartMillis;
+        double frac = Math.min(1.0, (double) elapsed / Math.max(1, customer2TurnDurationMs));
+        customer2Vx = customer2TurnStartX + customer2TurnOffsetX * frac;
+        customer2AnimationPaused = false;
+        customer2PausedFrameIndex = -1;
+        customer2FacingRight = (customer2TurnOffsetX > 0);
+        if (elapsed >= customer2TurnDurationMs)
+        {
+          customer2Turning = false;
+        }
+      }
+      else
+      {
+        double dy = customer2Speed * dt;
+        customer2Vy += dy;
+
+        if (customer2Vy >= 961)
+        {
+          customer2Vy = 961;
+          customer2ExitState = 2;
+          customer2ExitStartTime = now;
+          customer2Visible = false;
+        }
       }
     }
     else if (customer2ExitState == 2)
@@ -60,10 +76,43 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
         customer2ExitState = 0;
         customer2State = 0;
         customer2Vy = 961;
-        customer2Vx = 0.7 * 1600;
+        customer2Vx = customer2SpawnPercentX * 1535;
         customer2InitialVx = customer2Vx;
         customer2SpawnTimeMillis = now;
         customer2VerticalMovementStart = 0L;
+
+        selectedCustomer = rand.nextInt(2) + 1;
+        String idlePrefix = "customer" + selectedCustomer + "_idle";
+        String walkingPrefix = "customer" + selectedCustomer + "_walking";
+        
+        customer2 = new Imagesfood(idlePrefix + "/1");
+        customer2Image = customer2.getImage();
+        customer2FacingRight = false;
+        customer2Turning = false;
+        customer2TurningStartMillis = 0L;
+        
+        
+        new Thread(() -> {
+          java.util.List<BufferedImage> loaded = new java.util.ArrayList<>();
+          for (int i = 1; i <= 10; i++)
+          {
+            Imagesfood f = new Imagesfood(walkingPrefix + "/" + i);
+            BufferedImage bi = f.getImage();
+            if (bi != null) loaded.add(bi);
+          }
+          if (!loaded.isEmpty())
+          {
+            SwingUtilities.invokeLater(() -> {
+              customer2FramesOriginal.clear();
+              customer2FramesOriginal.addAll(loaded);
+              customer2FramesScaled.clear();
+              lastCustomer2ScaledW = -1;
+              lastCustomer2ScaledH = -1;
+              customer2AnimStartMillis = System.currentTimeMillis();
+              repaint();
+            });
+          }
+        }, "customer-respawn-loader").start();
 
         try
         {
@@ -126,6 +175,7 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
         if (customer2Vy <= finalY)
         {
           customer2Vy = finalY;
+          customer2AnimStartMillis = now;
           customer2State = 1;
         }
         else
@@ -134,6 +184,7 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
           if (newY <= finalY)
           {
             customer2Vy = finalY;
+            customer2AnimStartMillis = now;
             customer2State = 1;
           }
           else
@@ -162,6 +213,19 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
         }
       }
     }
+    try
+    {
+      if (!Double.isNaN(lastCustomer2Vx))
+      {
+        double deltaX = customer2Vx - lastCustomer2Vx;
+        if (Math.abs(deltaX) > 0.5)
+        {
+          customer2FacingRight = deltaX > 0.0;
+        }
+      }
+    }
+    catch (Throwable t) {}
+    lastCustomer2Vx = customer2Vx;
   }
 
   @Override
@@ -687,10 +751,14 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
           moneyAmount += price;
           pointAmount -= 1;
           SoundManager.playSellSound();
-          
-          // Trigger customer exit animation
           customer2ExitState = 1;
           customer2ExitStartTime = System.currentTimeMillis();
+          customer2Turning = true;
+          customer2TurningStartMillis = System.currentTimeMillis();
+          customer2TurnStartX = customer2Vx;
+          customer2AnimationPaused = false;
+          customer2PausedFrameIndex = -1;
+          customer2AnimStartMillis = System.currentTimeMillis();
           showCloudApple = false;
           cloudAppleImage = null;
         }
@@ -779,6 +847,8 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
   private BufferedImage customer2Image = null;
   private Imagesfood customer2;
   
+  private int selectedCustomer = 0;
+  
   private double customer2Vx = 1484; 
   private double customer2Vy = 961;  
   
@@ -803,6 +873,14 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
   
   private int customer2ExitState = 0;
   private long customer2ExitStartTime = 0L;
+
+  private boolean customer2Turning = false;
+  private long customer2TurningStartMillis = 0L;
+  private int customer2TurnDurationMs = 900;
+  private double customer2TurnOffsetX = -60.0;
+  private double customer2TurnStartX = 0.0;
+  private boolean customer2FacingRight = false;
+  private double lastCustomer2Vx = Double.NaN;
   
   
   
@@ -841,7 +919,6 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
     {
     int coinsEarned = 5;
     
-    // Get difficulty from question panel and award coins accordingly
     if (questionPanel != null)
     {
       String difficulty = questionPanel.getDifficulty();
@@ -1113,7 +1190,7 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
     
     
     
-    int tanBoxWidth = 290 + 50 + 8 + maxTextWidthVirtual -20; 
+    int tanBoxWidth = 290 + 50 + 8 + maxTextWidthVirtual + 100; 
     
     
     g.setColor(new Color(210, 180, 140)); 
@@ -1133,7 +1210,7 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
     
     
     final int leftX = 35 + uiShiftX;
-    final int rightX = 220 + uiShiftX;
+    final int rightX = 320 + uiShiftX;
     final int startY = 135 + uiShiftY;
     
     final int rowSpacing = 55;
@@ -1430,7 +1507,7 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
       final int V_W = 250;
       final int V_H = 250;
       
-      if (customer2State == 2)
+      if (customer2State == 2 && customer2ExitState == 0)
     {
         drawVirtualImage(g, customer2Image, (int)Math.round(customer2Vx), (int)Math.round(customer2Vy), V_W, V_H);
         
@@ -1476,14 +1553,26 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
         
         if (frameToDraw == null)
     {
-          drawVirtualImage(g, customer2Image, 750 + uiShiftX, 400 + uiShiftY, V_W, V_H);
+          drawVirtualImage(g, customer2Image, (int)Math.round(customer2Vx), (int)Math.round(customer2Vy), V_W, V_H);
         } else {
           
           int offsetX_local = (int) Math.round((panelW - VIRTUAL_WIDTH * scale) / 2.0);
           int offsetY_local = (int) Math.round((panelH - VIRTUAL_HEIGHT * scale) / 2.0);
           int ax = offsetX_local + (int) Math.round(customer2Vx * scale);
           int ay = offsetY_local + (int) Math.round(customer2Vy * scale);
-          g.drawImage(frameToDraw, ax, ay, aw, ah, this);
+          if (customer2FacingRight)
+          {
+            Graphics2D g2 = (Graphics2D) g;
+            java.awt.geom.AffineTransform at = new java.awt.geom.AffineTransform();
+            at.translate(ax + aw, ay);
+            at.scale(-1.0, 1.0);
+            
+            g2.drawImage(frameToDraw, at, null);
+          }
+          else
+          {
+            g.drawImage(frameToDraw, ax, ay, aw, ah, this);
+          }
         }
       }
     } else {
@@ -1772,8 +1861,12 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
             System.out.println("watermelon=" + (panel.watermelonImage != null));
             System.out.println("man_idle=" + (panel.man_idleImage != null));
           
+                java.util.Random customerRand = new java.util.Random();
+                panel.selectedCustomer = customerRand.nextInt(2) + 1;
+                String idlePrefix = "customer" + panel.selectedCustomer + "_idle";
+                String walkingPrefix = "customer" + panel.selectedCustomer + "_walking";
                 
-                panel.customer2 = new Imagesfood("customer2_idle/1");
+                panel.customer2 = new Imagesfood(idlePrefix + "/1");
                 panel.customer2Image = panel.customer2.getImage();
                 
                 
@@ -1797,7 +1890,7 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
                     java.util.List<BufferedImage> loaded = new java.util.ArrayList<>();
                     for (int i = 1; i <= 10; i++)
     {
-                      Imagesfood f = new Imagesfood("customer2_walking/" + i);
+                      Imagesfood f = new Imagesfood(walkingPrefix + "/" + i);
                       BufferedImage bi = f.getImage();
                       if (bi != null) loaded.add(bi);
                     }
@@ -1812,11 +1905,11 @@ public class Main extends JPanel implements MouseMotionListener, MouseListener
                         panel.lastCustomer2ScaledW = -1;
                         panel.lastCustomer2ScaledH = -1;
                         panel.customer2AnimStartMillis = System.currentTimeMillis();
-                        System.out.println("Loaded customer2 frames: " + panel.customer2FramesOriginal.size());
+                        System.out.println("Loaded customer frames: " + panel.customer2FramesOriginal.size());
                         panel.repaint();
                       });
                     }
-                  }, "customer2-loader").start();
+                  }, "customer-loader").start();
 
             
             
