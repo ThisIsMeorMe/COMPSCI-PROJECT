@@ -13,10 +13,13 @@ public class SoundManager
         File f = new File(filename);
         if (f.exists()) return f;
 
-        f = new File("/home/tejaswinipereira/FinaEDITPROB/" + filename);
+        f = new File("../" + filename);
         if (f.exists()) return f;
 
         f = new File("./" + filename);
+        if (f.exists()) return f;
+
+        f = new File("/home/tejaswinipereira/FinaEDITPROB/" + filename);
         if (f.exists()) return f;
 
         return null;
@@ -30,6 +33,21 @@ public class SoundManager
         {
             try
             {
+                // Try WAV files first (more reliable with Java audio)
+                File wavFile = findSoundFile("assets/sounds/BackgroundMusic (2).wav");
+                if (wavFile == null)
+                {
+                    wavFile = findSoundFile("assets/sounds/BackgroundMusic.wav");
+                }
+                
+                if (wavFile != null)
+                {
+                    System.out.println("Using WAV file for background music: " + wavFile.getAbsolutePath());
+                    playWAVLooping(wavFile);
+                    return;
+                }
+
+                // Fallback to MP3 with external players
                 File soundFile = findSoundFile("assets/sounds/BackgroundMusic.mp3");
                 if (soundFile == null)
                 {
@@ -38,15 +56,6 @@ public class SoundManager
                 }
 
                 System.out.println("Found background music at: " + soundFile.getAbsolutePath());
-
-                // Try using Java's audio system for WAV files
-                File wavFile = findSoundFile("assets/sounds/BackgroundMusic.wav");
-                if (wavFile != null)
-                {
-                    System.out.println("Using WAV file for background music");
-                    playWAVLooping(wavFile);
-                    return;
-                }
 
                 // Fallback to external players for MP3
                 String[][] commands =
