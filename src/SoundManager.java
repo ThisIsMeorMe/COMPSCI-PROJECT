@@ -33,7 +33,6 @@ public class SoundManager
         {
             try
             {
-                // Try WAV files first (more reliable with Java audio)
                 File wavFile = findSoundFile("assets/sounds/BackgroundMusic (2).wav");
                 if (wavFile == null)
                 {
@@ -47,7 +46,6 @@ public class SoundManager
                     return;
                 }
 
-                // Fallback to MP3 with external players
                 File soundFile = findSoundFile("assets/sounds/BackgroundMusic.mp3");
                 if (soundFile == null)
                 {
@@ -57,7 +55,6 @@ public class SoundManager
 
                 System.out.println("Found background music at: " + soundFile.getAbsolutePath());
 
-                // Fallback to external players for MP3
                 String[][] commands =
                 {
                     {"powershell", "-NoProfile", "-Command", "& {Add-Type -AssemblyName PresentationCore; $player = [System.Media.SoundPlayer]::new('" + soundFile.getAbsolutePath() + "'); $player.PlayLooping(); while($true) { Start-Sleep -Seconds 1 }}"},
@@ -100,7 +97,6 @@ public class SoundManager
         backgroundMusicClip.loop(Clip.LOOP_CONTINUOUSLY);
         System.out.println("Background music playing (looped)");
         
-        // Keep the thread alive while music plays
         try
         {
             Thread.sleep(Long.MAX_VALUE);
@@ -135,7 +131,6 @@ public class SoundManager
 
                 System.out.println("Playing sound: " + soundFile.getAbsolutePath());
 
-                // Try Java audio system first for WAV
                 if (soundFile.getName().endsWith(".wav"))
                 {
                     try
@@ -145,18 +140,16 @@ public class SoundManager
                         clip.open(audioStream);
                         clip.start();
                         
-                        // Wait for the clip to finish
                         Thread.sleep(clip.getMicrosecondLength() / 1000 + 100);
                         clip.close();
                         return;
                     }
                     catch (Exception e)
                     {
-                        System.out.println("Could not play WAV with Java audio: " + e.getMessage());
+                        System.out.println("PROBLEM: " + e.getMessage());
                     }
                 }
 
-                // Fallback to external players
                 String[][] commands =
                 {
                     {"powershell", "-NoProfile", "-Command", "& {Add-Type -AssemblyName PresentationCore; [System.Media.SoundPlayer]::new('" + soundFile.getAbsolutePath() + "').PlaySync()}"},
